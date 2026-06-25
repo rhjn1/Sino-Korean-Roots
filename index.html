@@ -1,0 +1,3268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>한자 뿌리 | Hanja Roots</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;overflow:hidden}
+body{position:fixed;width:100%;height:100%;overflow:hidden;background:#0f172a;color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;user-select:none;-webkit-tap-highlight-color:transparent}
+
+/* App Shell */
+.app{display:flex;flex-direction:column;height:100%;height:100dvh}
+
+/* Header */
+.hdr{display:flex;align-items:center;padding:.6rem .9rem;flex-shrink:0;border-bottom:1px solid #1e293b;gap:.5rem}
+.hdr-center{flex:1;text-align:center}
+.hdr-center h1{font-size:1.05rem;font-weight:700;color:#34d399;letter-spacing:.02em}
+.hdr-center p{font-size:.6rem;color:#475569;margin-top:1px;letter-spacing:.03em}
+.hdr-side{width:2.25rem;flex-shrink:0}
+.icon-btn{background:#1e293b;border:1px solid #334155;color:#94a3b8;width:2.25rem;height:2.25rem;border-radius:.5rem;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;-webkit-appearance:none}
+.icon-btn:active{background:#334155}
+
+/* Main / Views */
+.main{flex:1;overflow:hidden;position:relative;min-height:0}
+.view{position:absolute;inset:0;display:none;flex-direction:column;align-items:stretch}
+.view.active{display:flex}
+
+/* CARDS VIEW */
+#view-cards{padding:.4rem .9rem .6rem;align-items:center;justify-content:space-between}
+.deck-info{font-size:.65rem;color:#475569;text-align:center;flex-shrink:0;padding:.1rem 0}
+.card-area{flex:1;display:flex;align-items:center;justify-content:center;width:100%;max-width:22rem;min-height:0}
+.perspective{width:100%;aspect-ratio:3/4;max-height:100%;perspective:1000px;cursor:pointer;touch-action:none;position:relative}
+#flashcard{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,0,.2,1);border-radius:1.5rem;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+#flashcard.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:1.5rem;display:flex;flex-direction:column;justify-content:space-between;padding:1.25rem}
+.face-front{background:#1e293b;border:2px solid #334155;text-align:center;align-items:center}
+.face-back{background:#022c22;border:2px solid #10b981;transform:rotateY(180deg)}
+.progress{font-size:.65rem;font-weight:600;letter-spacing:.05em;color:#475569;text-align:center;padding:0 2.4rem}
+.progress.bk{color:rgba(52,211,153,.5);text-align:center;padding:0 2.4rem}
+.front-body{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:.9rem;width:100%}
+.grp-badge{font-size:.55rem;color:#64748b;letter-spacing:.08em;text-transform:uppercase;background:#0f172a;padding:.15rem .6rem;border-radius:999px;border:1px solid #1e293b;max-width:90%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#affix-ko{font-size:2.6rem;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1.1}
+#examples-ko{font-size:1rem;color:#f1f5f9;font-weight:500;line-height:1.85}
+#examples-ko b{color:#34d399;font-weight:700}
+.hint{font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;color:#334155;flex-shrink:0}
+.hint.bk{color:rgba(16,185,129,.4);text-align:center}
+.back-body{flex:1;display:flex;flex-direction:column;gap:.65rem;overflow:hidden;min-height:0}
+.back-title{border-bottom:1px solid #065f46;padding-bottom:.5rem;flex-shrink:0}
+#affix-en{font-size:1.35rem;font-weight:700;color:#fff}
+#affix-ko-back{font-size:.8rem;color:#34d399;margin-top:.1rem}
+#examples-en{font-size:.7rem;color:#d1fae5;background:rgba(15,23,42,.45);padding:.6rem;border-radius:.65rem;border:1px solid rgba(6,78,59,.5);overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;touch-action:pan-y;display:flex;flex-direction:column;gap:.55rem}
+.bd-line{display:flex;align-items:center;flex-wrap:wrap;gap:.35rem;background:rgba(2,44,34,.45);border:1px solid rgba(6,95,70,.35);border-radius:.6rem;padding:.5rem}
+.bd-word{font-size:.95rem;font-weight:700;color:#fff;margin-right:.15rem}
+.bd-plus{color:#475569;font-weight:700;font-size:.8rem}
+.bd-arrow{color:#475569;font-weight:700;font-size:.95rem;padding:0 .1rem}
+.bd-result{font-size:.78rem;color:#a7f3d0;font-weight:600}
+.tile{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.3rem .45rem;border-radius:.5rem;background:rgba(2,44,34,.8);border:1px solid #1e293b;line-height:1.2}
+.tile .t-head{font-size:.82rem;font-weight:700;color:#cbd5e1;white-space:nowrap}
+.tile .t-gl{font-size:.55rem;color:#94a3b8;margin-top:.1rem;text-align:center;white-space:nowrap}
+.tile.tap{background:rgba(16,185,129,.12);border-color:#10b981;cursor:pointer}
+.tile.tap .t-head{color:#34d399}
+.tile.tap .t-head::after{content:" ›";color:#10b981}
+.tile.tap .t-gl{color:#6ee7b7}
+.tile.tap:active{background:rgba(16,185,129,.25)}
+.tile.peek{background:rgba(234,179,8,.12);border-color:#eab308;cursor:pointer}
+.tile.peek .t-head{color:#fbbf24}
+.tile.peek .t-head::after{content:" ›";color:#eab308}
+.tile.peek .t-gl{color:#fde68a}
+.tile.peek:active{background:rgba(234,179,8,.25)}
+.sent{flex-basis:100%;width:100%;margin-top:.45rem;padding-top:.45rem;border-top:1px dashed rgba(6,95,70,.45);display:flex;flex-direction:column;gap:.12rem}
+.sent-ko{font-size:.72rem;color:#e2e8f0;line-height:1.5}
+.sent-ko b{color:#6ee7b7;font-weight:700}
+.sent-en{font-size:.62rem;color:#94a3b8;line-height:1.4}
+.info-btn{position:absolute;top:2.7rem;right:.85rem;width:1.5rem;height:1.5rem;border-radius:50%;background:rgba(52,211,153,.15);border:1px solid #10b981;color:#34d399;font-size:.85rem;font-weight:700;font-style:italic;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3;font-family:Georgia,serif}
+.info-btn:active{background:rgba(52,211,153,.3)}
+.star-btn{position:absolute;top:.55rem;left:.7rem;width:1.9rem;height:1.9rem;border-radius:50%;background:transparent;border:none;color:#475569;font-size:1.4rem;line-height:1;cursor:pointer;z-index:3;display:flex;align-items:center;justify-content:center;padding:0;-webkit-appearance:none}
+.star-btn.on{color:#fbbf24}
+.star-btn:active{transform:scale(.85)}
+.note-overlay{position:absolute;inset:0;background:rgba(2,12,9,.97);border-radius:1.5rem;z-index:10;display:none;flex-direction:column;padding:1.1rem;border:2px solid #10b981}
+.note-overlay.show{display:flex}
+.note-hdr{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #065f46;padding-bottom:.5rem;margin-bottom:.6rem;flex-shrink:0}
+.note-hdr-title{font-size:.95rem;font-weight:700;color:#fff}
+.note-close{width:1.6rem;height:1.6rem;border-radius:50%;background:#1e293b;border:1px solid #334155;color:#94a3b8;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.note-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+.note-section{margin-bottom:.9rem}
+.note-label{font-size:.55rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.45rem;padding-bottom:.2rem;border-bottom:1px solid #1e293b}
+.note-label.sino{color:#fbbf24}
+.note-label.nat{color:#60a5fa}
+.note-entry{margin-bottom:.55rem;padding:.1rem 0 .1rem .6rem;border-left:2px solid #1e293b}
+.note-entry .ne-head{font-size:.82rem;font-weight:700;color:#cbd5e1}
+.note-entry .ne-gloss{font-size:.75rem;color:#94a3b8}
+.note-entry .ne-ex{font-size:.72rem;color:#64748b;margin-top:.1rem;line-height:1.5}
+.note-entry.tappable{border-left-color:#10b981;cursor:pointer}
+.note-entry.tappable .ne-head{color:#34d399}
+.note-entry.tappable .ne-ex{color:#6ee7b7}
+.note-entry.tappable:active{background:rgba(16,185,129,.12)}
+.note-entry.tappable .ne-head::after{content:" ›";color:#10b981;font-weight:700}
+.note-entry.peekable{border-left-color:#eab308;cursor:pointer}
+.note-entry.peekable .ne-head{color:#fbbf24}
+.note-entry.peekable .ne-head::after{content:" ›";color:#eab308;font-weight:700}
+.note-entry.peekable:active{background:rgba(234,179,8,.12)}
+.card-nav{display:flex;justify-content:space-between;width:100%;max-width:22rem;padding-top:.4rem;flex-shrink:0;gap:.75rem}
+.card-nav button{flex:1;border:none;cursor:pointer;color:#fff;padding:.6rem 0;border-radius:.75rem;font-weight:700;font-size:.9rem;transition:transform .12s,opacity .15s;-webkit-appearance:none}
+.card-nav button:active{transform:scale(.95)}
+#prevBtn{background:#1e293b;border:1px solid #334155;color:#94a3b8}
+#nextBtn{background:#059669}
+
+/* TABLE VIEW */
+#view-table{touch-action:pan-y}
+.tbl-filter{padding:.55rem .9rem;background:#0f172a;border-bottom:1px solid #1e293b;flex-shrink:0}
+.tbl-filter input{width:100%;background:#1e293b;border:1px solid #334155;color:#f1f5f9;padding:.4rem .7rem;border-radius:.6rem;font-size:.85rem;outline:none;-webkit-appearance:none}
+.tbl-filter input::placeholder{color:#475569}
+.tbl-scroll{flex:1;overflow-y:scroll;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+.grp-hdr{background:#0a1120;padding:.35rem .9rem;font-size:.6rem;font-weight:700;color:#34d399;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid #1e293b;border-top:1px solid #1e293b;position:sticky;top:0;z-index:2}
+.tbl-row{display:flex;align-items:center;padding:.55rem .9rem;border-bottom:1px solid #1e293b;gap:.5rem;cursor:pointer;transition:background .1s;min-height:2.8rem}
+.tbl-row:active{background:#1e293b}
+.tbl-root{font-size:.9rem;font-weight:700;color:#fff;flex-shrink:0;width:3rem}
+.tbl-hanja{font-size:.75rem;color:#64748b;flex-shrink:0;width:2.5rem}
+.tbl-gloss{font-size:.8rem;color:#6ee7b7;flex:1}
+.tbl-arrow{font-size:.85rem;color:#334155;flex-shrink:0}
+.empty-msg{text-align:center;padding:3rem 1rem;color:#475569;font-size:.85rem;line-height:1.8}
+
+/* OVERLAY / MENU */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:50;display:none;align-items:flex-end;touch-action:none}
+.overlay.open{display:flex}
+.sheet{background:#0f172a;border-top:1px solid #1e293b;border-radius:1.25rem 1.25rem 0 0;width:100%;max-height:82vh;display:flex;flex-direction:column;padding:.75rem .9rem .9rem}
+.sheet-handle{width:2.25rem;height:.22rem;background:#334155;border-radius:999px;margin:0 auto .65rem}
+.sheet-title{font-size:.72rem;font-weight:700;color:#64748b;letter-spacing:.1em;text-transform:uppercase;text-align:center;margin-bottom:.65rem}
+.all-btns{display:flex;gap:.5rem;margin-bottom:.65rem}
+.all-btns button{flex:1;padding:.4rem;border-radius:.55rem;font-size:.75rem;font-weight:700;border:1px solid #334155;cursor:pointer;background:#1e293b;color:#94a3b8;transition:background .15s;-webkit-appearance:none}
+.all-btns button:active{background:#334155}
+.grp-list{overflow-y:scroll;-webkit-overflow-scrolling:touch;flex:1;touch-action:pan-y}
+.grp-item{display:flex;align-items:center;justify-content:space-between;padding:.65rem .2rem;border-bottom:1px solid #1e293b}
+.grp-item:last-child{border-bottom:none}
+.grp-item-name{font-size:.82rem;font-weight:600;color:#f1f5f9}
+.star-row{background:rgba(251,191,36,.07);margin:0 -.2rem;padding-left:.2rem;padding-right:.2rem;border-radius:.5rem;border-bottom:1px solid rgba(251,191,36,.2)!important}
+.star-row .grp-item-name{color:#fbbf24}
+.grp-item-count{font-size:.62rem;color:#475569;margin-top:.1rem}
+.tog{position:relative;width:2.6rem;height:1.5rem;flex-shrink:0}
+.tog input{position:absolute;opacity:0;width:0;height:0}
+.tog-track{position:absolute;inset:0;background:#1e293b;border:1.5px solid #334155;border-radius:999px;cursor:pointer;transition:background .2s,border-color .2s}
+.tog input:checked~.tog-track{background:#059669;border-color:#059669}
+.tog-thumb{position:absolute;top:50%;left:.2rem;width:1.1rem;height:1.1rem;background:#fff;border-radius:50%;transform:translateY(-50%);transition:left .2s;pointer-events:none}
+.tog input:checked~.tog-thumb{left:calc(100% - 1.3rem)}
+.done-btn{margin-top:.65rem;width:100%;padding:.6rem;background:#059669;color:#fff;border:none;border-radius:.75rem;font-weight:700;font-size:.95rem;cursor:pointer;-webkit-appearance:none}
+.done-btn:active{opacity:.85}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="hdr">
+    <div class="hdr-side"></div>
+    <div class="hdr-center">
+      <h1>한자 뿌리 | Hanja Roots</h1>
+      <p id="hdr-sub">Tap to flip · Swipe or use buttons</p>
+    </div>
+    <div class="hdr-side" style="display:flex;gap:.4rem;justify-content:flex-end">
+      <button class="icon-btn" id="table-btn" onclick="showTable()" title="Table view">📋</button>
+      <button class="icon-btn" id="menu-btn" onclick="openMenu()">☰</button>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- CARDS -->
+    <div class="view active" id="view-cards">
+      <div class="deck-info" id="deck-info">—</div>
+      <div class="card-area">
+        <div class="perspective" onclick="flipCard()">
+          <div id="flashcard">
+            <div class="face face-front">
+              <button class="star-btn" id="star-btn" onclick="toggleStar(event)">☆</button>
+              <div class="progress" id="prog-front">Card 1</div>
+              <div class="front-body">
+                <div class="grp-badge" id="grp-badge">—</div>
+                <div id="affix-ko"></div>
+                <div id="examples-ko"></div>
+              </div>
+              <div class="hint">Tap to flip</div>
+            </div>
+            <div class="face face-back">
+              <button class="info-btn" id="info-btn" onclick="openNote(event)" style="display:none">i</button>
+              <div class="progress bk" id="prog-back">Card 1</div>
+              <div class="back-body">
+                <div class="back-title">
+                  <div id="affix-en"></div>
+                  <div id="affix-ko-back"></div>
+                </div>
+                <div id="examples-en"></div>
+              </div>
+              <div class="hint bk">Tap to flip back</div>
+            </div>
+          </div>
+          <div class="note-overlay" id="note-overlay">
+            <div class="note-hdr">
+              <div class="note-hdr-title" id="note-title">Confusion points</div>
+              <button class="note-close" onclick="closeNote(event)">✕</button>
+            </div>
+            <div class="note-body" id="note-body"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-nav">
+        <button id="prevBtn" onclick="prevCard(event)">← Prev</button>
+        <button id="nextBtn" onclick="nextCard(event)">Next →</button>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="view" id="view-table">
+      <div class="tbl-filter" style="display:flex;gap:.5rem;align-items:center">
+        <button class="icon-btn" onclick="showCards()" style="flex-shrink:0">←</button>
+        <input type="text" id="tbl-input" placeholder="Filter by root or meaning…" oninput="renderTable()" autocomplete="off" autocorrect="off" spellcheck="false">
+      </div>
+      <div class="tbl-scroll" id="tbl-scroll"></div>
+    </div>
+
+  </main>
+
+</div>
+
+<!-- Group Menu -->
+<div class="overlay" id="overlay" onclick="handleOverlayClick(event)">
+  <div class="sheet" id="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Active Groups</div>
+    <div class="all-btns">
+      <button onclick="setAll(true)">All On</button>
+      <button onclick="setAll(false)">All Off</button>
+    </div>
+    <div class="grp-list" id="grp-list"></div>
+    <button class="done-btn" onclick="closeMenu()">Done</button>
+  </div>
+</div>
+
+<script>
+const GROUPS = [
+  { id:1, name:"Movement, Direction & Space" },
+  { id:2, name:"Time, Nature & Elements" },
+  { id:3, name:"People, Family & Roles" },
+  { id:4, name:"Mind, Senses & Communication" },
+  { id:5, name:"Places, Buildings & Objects" },
+  { id:6, name:"Action, Work, Law & Production" },
+  { id:7, name:"Quantity, Degree, Economy & Status" },
+];
+
+const CARDS = [
+  // ── GROUP 1 ──────────────────────────────────────────────────────────────
+  { group:1, root:"동 (動)", gloss:"To Move",
+    examples:["운동","자동차","동물"],
+    breakdown:[
+      "<b>운동</b>: Wield (운) + Move (동) → Exercise / Workout",
+      "<b>자동차</b>: Self (자) + Move (동) + Vehicle (차) → Car / Automobile",
+      "<b>동물</b>: Move (동) + Physical Thing (물) → Animal"
+    ]
+  },
+  { group:1, root:"출 (出)", gloss:"Out / Emerge",
+    examples:["출발","출구","수출"],
+    breakdown:[
+      "<b>출발</b>: Go out (출) + Launch (발) → Departure",
+      "<b>출구</b>: Go out (출) + Gate/Mouth (구) → Exit",
+      "<b>수출</b>: Transport (수) + Go out (출) → Export"
+    ]
+  },
+  { group:1, root:"입 (入)", gloss:"Enter / Go In",
+    examples:["입구","수입","입장"],
+    breakdown:[
+      "<b>입구</b>: Enter (입) + Gate/Mouth (구) → Entrance",
+      "<b>수입</b>: Gather/Receive (수) + Enter (입) → Import / Income",
+      "<b>입장</b>: Enter (입) + Place/Yard (장) → Admission / Entrance"
+    ]
+  },
+  { group:1, root:"행 (行)", gloss:"Go / Act",
+    examples:["행동","여행","비행기"],
+    breakdown:[
+      "<b>행동</b>: Go/Act (행) + Move (동) → Action / Behavior",
+      "<b>여행</b>: Travel (여) + Go/Act (행) → Travel / Trip",
+      "<b>비행기</b>: Fly (비) + Go/Act (행) + Machine (기) → Airplane"
+    ]
+  },
+  { group:1, root:"상 (上)", gloss:"Up / Above",
+    examples:["상반기","이상","상하"],
+    breakdown:[
+      "<b>상반기</b>: Up/First (상) + Half (반) + Period (기) → First half of the year",
+      "<b>이상</b>: By means of (이) + Above (상) → Above / More than",
+      "<b>상하</b>: Up (상) + Down (하) → Vertical / High and low"
+    ]
+  },
+  { group:1, root:"하 (下)", gloss:"Down / Below",
+    examples:["지하","이하","낙하"],
+    breakdown:[
+      "<b>지하</b>: Earth/Ground (지) + Below (하) → Underground / Subway level",
+      "<b>이하</b>: By means of (이) + Below (하) → Below / Less than",
+      "<b>낙하</b>: Drop (낙) + Down (하) → Fall / Descent"
+    ]
+  },
+  { group:1, root:"내 (內)", gloss:"Inside",
+    examples:["내부","국내","실내"],
+    breakdown:[
+      "<b>내부</b>: Inside (내) + Part/Section (부) → Interior / Inside",
+      "<b>국내</b>: Country (국) + Inside (내) → Domestic",
+      "<b>실내</b>: Room (실) + Inside (내) → Indoors"
+    ]
+  },
+  { group:1, root:"외 (外)", gloss:"Outside",
+    examples:["외부","외국","실외"],
+    breakdown:[
+      "<b>외부</b>: Outside (외) + Part/Section (부) → Exterior / Outside",
+      "<b>외국</b>: Outside (외) + Country (국) → Foreign country",
+      "<b>실외</b>: Room (실) + Outside (외) → Outdoors"
+    ]
+  },
+  { group:1, root:"전 (前)", gloss:"Before / Front",
+    examples:["오전","전반","직전"],
+    breakdown:[
+      "<b>오전</b>: Noon (오) + Before (전) → A.M. / Morning",
+      "<b>전반</b>: Front/First (전) + Half (반) → First half (of a game/event)",
+      "<b>직전</b>: Straight/Direct (직) + Before (전) → Right before"
+    ]
+  },
+  { group:1, root:"후 (後)", gloss:"After / Back",
+    examples:["오후","후반","직후"],
+    breakdown:[
+      "<b>오후</b>: Noon (오) + After (후) → P.M. / Afternoon",
+      "<b>후반</b>: Back/Second (후) + Half (반) → Second half (of a game/event)",
+      "<b>직후</b>: Straight/Direct (직) + After (후) → Right after"
+    ]
+  },
+  { group:1, root:"좌 (左)", gloss:"Left",
+    examples:["좌회전","좌측","좌석"],
+    breakdown:[
+      "<b>좌회전</b>: Left (좌) + Turn (회) + Roll (전) → Left turn",
+      "<b>좌측</b>: Left (좌) + Side (측) → Left side",
+      "<b>좌석</b>: Left (좌) + Seat (석) → Seat"
+    ]
+  },
+  { group:1, root:"우 (右)", gloss:"Right",
+    examples:["우회전","우측","좌우"],
+    breakdown:[
+      "<b>우회전</b>: Right (우) + Turn (회) + Roll (전) → Right turn",
+      "<b>우측</b>: Right (우) + Side (측) → Right side",
+      "<b>좌우</b>: Left (좌) + Right (우) → Both sides / Dominate / Control"
+    ]
+  },
+  { group:1, root:"회 (回)", gloss:"Turn / Return",
+    examples:["회전","회복","회수"],
+    breakdown:[
+      "<b>회전</b>: Turn (회) + Roll/Spin (전) → Rotation / Spin",
+      "<b>회복</b>: Return (회) + Restore (복) → Recovery / Healing",
+      "<b>회수</b>: Return (회) + Gather/Receive (수) → Retrieval / Collection"
+    ]
+  },
+  { group:1, root:"반 (反)", gloss:"Opposite / Anti",
+    examples:["반대","반항","반비례"],
+    breakdown:[
+      "<b>반대</b>: Opposite (반) + Face/Respond (대) → Opposition / Opposite",
+      "<b>반항</b>: Opposite (반) + Resist/Defy (항) → Rebellion / Defiance",
+      "<b>반비례</b>: Opposite (반) + Compare (비) + Ratio (례) → Inverse proportion"
+    ]
+  },
+  { group:1, root:"통 (通)", gloss:"Pass / Through",
+    examples:["교통","통화","통과"],
+    breakdown:[
+      "<b>교통</b>: Cross/Mix (교) + Pass through (통) → Traffic / Transit",
+      "<b>통화</b>: Connect/Pass (통) + Speech/Talk (화) → Phone call / Call duration",
+      "<b>통과</b>: Pass through (통) + Cross/Pass (과) → Passing (a test/barrier)"
+    ]
+  },
+  { group:1, root:"도 (到)", gloss:"Arrive",
+    examples:["도착","도달","주도"],
+    breakdown:[
+      "<b>도착</b>: Arrive (도) + Touch/Attach (착) → Arrival",
+      "<b>도달</b>: Arrive (도) + Reach/Attain (달) → Attainment / Reaching a goal",
+      "<b>주도</b>: All around/Circle (주) + Arrive (도) → Thorough / Meticulous"
+    ]
+  },
+  { group:1, root:"운 (運)", gloss:"Move / Transport",
+    examples:["운전","운송","운명"],
+    breakdown:[
+      "<b>운전</b>: Move/Transport (운) + Roll/Turn (전) → Driving",
+      "<b>운송</b>: Move/Transport (운) + Send (송) → Transportation / Shipping",
+      "<b>운명</b>: Move/Fate (운) + Life/Command (명) → Destiny / Fate"
+    ]
+  },
+  { group:1, root:"락/낙 (落)", gloss:"Drop / Fall",
+    examples:["추락","하락","낙하"],
+    breakdown:[
+      "<b>추락</b>: Fall/Plunge (추) + Drop (락) → Crash / Plunge (middle = 락)",
+      "<b>하락</b>: Down (하) + Drop (락) → Drop / Decline (middle = 락)",
+      "<b>낙하</b>: Drop (낙) + Down (하) → Fall / Descent (initial = 낙)"
+    ]
+  },
+  { group:1, root:"유 (流)", gloss:"Flow / Float",
+    examples:["유행","교류","전류"],
+    breakdown:[
+      "<b>유행</b>: Flow (유) + Go/Act (행) → Trend / Fashion",
+      "<b>교류</b>: Cross/Mix (교) + Flow (유) → Cultural Exchange / Intercourse",
+      "<b>전류</b>: Electricity (전) + Flow (유) → Electric current"
+    ]
+  },
+  { group:1, root:"가 (加)", gloss:"Add / Increase",
+    examples:["추가","가속","가공"],
+    breakdown:[
+      "<b>추가</b>: Pursue/Follow (추) + Add (가) → Addition / Supplement",
+      "<b>가속</b>: Add (가) + Speed (속) → Acceleration",
+      "<b>가공</b>: Add (가) + Labor/Work (공) → Processing / Manufacturing"
+    ]
+  },
+  { group:1, root:"감 (減)", gloss:"Decrease",
+    examples:["감소","감축","감면"],
+    breakdown:[
+      "<b>감소</b>: Decrease (감) + Few/Little (소) → Decrease / Decline",
+      "<b>감축</b>: Decrease (감) + Shrink/Bind (축) → Reduction / Downsizing",
+      "<b>감면</b>: Decrease (감) + Exempt/Free (면) → Reduction and exemption (tax/fees)"
+    ]
+  },
+  { group:1, root:"교 (交)", gloss:"Cross / Mix",
+    examples:["교환","교류","외교"],
+    breakdown:[
+      "<b>교환</b>: Cross/Mix (교) + Change/Swap (환) → Exchange / Swap",
+      "<b>교류</b>: Cross/Mix (교) + Flow (유) → Exchange / Interaction",
+      "<b>외교</b>: Outside (외) + Cross/Mix (교) → Diplomacy"
+    ]
+  },
+  { group:1, root:"향 (向)", gloss:"Toward",
+    examples:["방향","향상","경향"],
+    breakdown:[
+      "<b>방향</b>: Direction/Side (방) + Toward (향) → Direction",
+      "<b>향상</b>: Toward (향) + Up (상) → Improvement / Progress",
+      "<b>경향</b>: Lean/Tilt (경) + Toward (향) → Tendency / Inclination"
+    ]
+  },
+
+  // ── GROUP 2 ──────────────────────────────────────────────────────────────
+  { group:2, root:"시 (時)", gloss:"Time / Hour",
+    examples:["시간","시계","동시"],
+    breakdown:[
+      "<b>시간</b>: Time (시) + Between (간) → Time / Hour",
+      "<b>시계</b>: Time (시) + Gauge/Count (계) → Clock / Watch",
+      "<b>동시</b>: Same (동) + Time (시) → Simultaneous / Same time"
+    ]
+  },
+  { group:2, root:"간 (間)", gloss:"Interval / Between",
+    examples:["중간","기간","공간"],
+    breakdown:[
+      "<b>중간</b>: Middle (중) + Between (간) → Middle / Center",
+      "<b>기간</b>: Period (기) + Between (간) → Duration / Period",
+      "<b>공간</b>: Empty (공) + Between (간) → Space / Room"
+    ]
+  },
+  { group:2, root:"일 (日)", gloss:"Day / Sun",
+    examples:["매일","일요일","평일"],
+    breakdown:[
+      "<b>매일</b>: Every (매) + Day (일) → Daily / Everyday",
+      "<b>일요일</b>: Sun (일) + Planet (요) + Day (일) → Sunday",
+      "<b>평일</b>: Flat/Normal (평) + Day (일) → Weekday"
+    ]
+  },
+  { group:2, root:"월 (月)", gloss:"Month / Moon",
+    examples:["매월","월요일","개월"],
+    breakdown:[
+      "<b>매월</b>: Every (매) + Month (월) → Monthly",
+      "<b>월요일</b>: Moon (월) + Planet (요) + Day (일) → Monday",
+      "<b>개월</b>: Unit counter (개) + Month (월) → Number of months"
+    ]
+  },
+  { group:2, root:"년/연 (年)", gloss:"Year",
+    examples:["연말","내년","매년"],
+    breakdown:[
+      "<b>연말</b>: Year (연) + End (말) → Year-end (initial = 연)",
+      "<b>내년</b>: Coming (내) + Year (년) → Next year (middle = 년)",
+      "<b>매년</b>: Every (매) + Year (년) → Annually / Every year (middle = 년)"
+    ]
+  },
+  { group:2, root:"기 (氣)", gloss:"Air / Energy",
+    examples:["공기","기분","전기"],
+    breakdown:[
+      "<b>공기</b>: Empty/Sky (공) + Air/Energy (기) → Air / Atmosphere",
+      "<b>기분</b>: Energy (기) + Divide/Share (분) → Mood / Feeling",
+      "<b>전기</b>: Lightning (전) + Energy (기) → Electricity"
+    ]
+  },
+  { group:2, root:"천 (天)", gloss:"Sky / Heaven",
+    examples:["천재","천국","천사"],
+    breakdown:[
+      "<b>천재</b>: Heaven (천) + Talent (재) → Genius",
+      "<b>천국</b>: Heaven (천) + Country/Kingdom (국) → Heaven / Paradise",
+      "<b>천사</b>: Heaven (천) + Messenger (사) → Angel"
+    ]
+  },
+  { group:2, root:"지 (地)", gloss:"Earth / Ground",
+    examples:["지하","지역","지도"],
+    breakdown:[
+      "<b>지하</b>: Earth (지) + Below (하) → Underground",
+      "<b>지역</b>: Earth (지) + Boundary (역) → Region / Area / Zone",
+      "<b>지도</b>: Earth (지) + Picture (도) → Map"
+    ]
+  },
+  { group:2, root:"수 (水)", gloss:"Water",
+    examples:["수영","생수","음료수"],
+    breakdown:[
+      "<b>수영</b>: Water (수) + Swim (영) → Swimming",
+      "<b>생수</b>: Fresh/Live (생) + Water (수) → Mineral/Bottled water",
+      "<b>음료수</b>: Drink (음) + Material (료) + Water (수) → Beverage / Soft drink"
+    ]
+  },
+  { group:2, root:"화 (火)", gloss:"Fire",
+    examples:["화재","화요일","화산"],
+    breakdown:[
+      "<b>화재</b>: Fire (화) + Disaster (재) → An active fire / Blaze",
+      "<b>화요일</b>: Fire (화) + Planet (요) + Day (일) → Tuesday",
+      "<b>화산</b>: Fire (화) + Mountain (산) → Volcano"
+    ]
+  },
+  { group:2, root:"풍 (風)", gloss:"Wind",
+    examples:["태풍","풍경","선풍기"],
+    breakdown:[
+      "<b>태풍</b>: Huge/Great (태) + Wind (풍) → Typhoon",
+      "<b>풍경</b>: Wind (풍) + Scenery (경) → Scenery / Landscape",
+      "<b>선풍기</b>: Turn/Whirl (선) + Wind (풍) + Machine (기) → Electric fan"
+    ]
+  },
+  { group:2, root:"산 (山)", gloss:"Mountain",
+    examples:["등산","산맥","화산"],
+    breakdown:[
+      "<b>등산</b>: Ascend (등) + Mountain (산) → Hiking / Mountaineering",
+      "<b>산맥</b>: Mountain (산) + Pulse/Vein (맥) → Mountain range",
+      "<b>화산</b>: Fire (화) + Mountain (산) → Volcano"
+    ]
+  },
+  { group:2, root:"금 (金)", gloss:"Gold / Metal / Money",
+    examples:["현금","금요일","요금"],
+    breakdown:[
+      "<b>현금</b>: Current (현) + Money (금) → Cash",
+      "<b>금요일</b>: Gold (금) + Planet (요) + Day (일) → Friday",
+      "<b>요금</b>: Require/Fee (요) + Money (금) → Fee / Fare"
+    ]
+  },
+  { group:2, root:"목 (木)", gloss:"Wood / Tree",
+    examples:["목재","목요일","수목원"],
+    breakdown:[
+      "<b>목재</b>: Wood (목) + Material (재) → Timber / Lumber",
+      "<b>목요일</b>: Wood (목) + Planet (요) + Day (일) → Thursday",
+      "<b>수목원</b>: Tree (수) + Tree (목) + Garden (원) → Arboretum / Botanical garden"
+    ]
+  },
+  { group:2, root:"토 (土)", gloss:"Earth / Soil",
+    examples:["토지","토요일","영토"],
+    breakdown:[
+      "<b>토지</b>: Soil (토) + Earth/Land (지) → Land / Real estate ground",
+      "<b>토요일</b>: Earth (토) + Planet (요) + Day (일) → Saturday",
+      "<b>영토</b>: Territory/Command (영) + Land (토) → Territory / Domain"
+    ]
+  },
+  { group:2, root:"광 (光)", gloss:"Light",
+    examples:["관광","영광","광선"],
+    breakdown:[
+      "<b>관광</b>: Observe (관) + Light (광) → Tourism / Sightseeing",
+      "<b>영광</b>: Flourish (영) + Light (광) → Glory / Honor",
+      "<b>광선</b>: Light (광) + Line (선) → Light ray / Beam"
+    ]
+  },
+  { group:2, root:"야 (夜)", gloss:"Night",
+    examples:["야간","야식","야경"],
+    breakdown:[
+      "<b>야간</b>: Night (야) + Interval (간) → Nighttime",
+      "<b>야식</b>: Night (야) + Food (식) → Late-night snack",
+      "<b>야경</b>: Night (야) + Scenery (경) → Night view"
+    ]
+  },
+  { group:2, root:"조 (朝)", gloss:"Morning",
+    examples:["조식","조조","조기"],
+    breakdown:[
+      "<b>조식</b>: Morning (조) + Food (식) → Breakfast",
+      "<b>조조</b>: Early/Morning (조) + Morning (조) → Early morning (e.g. early movie discount)",
+      "<b>조기</b>: Early/Morning (조) + Period (기) → Early stage / Premature phase"
+    ]
+  },
+
+  // ── GROUP 3 ──────────────────────────────────────────────────────────────
+  { group:3, root:"인 (人)", gloss:"Person / Human",
+    examples:["인간","외국인","인구"],
+    breakdown:[
+      "<b>인간</b>: Human (인) + Between (간) → Humanity / Human Being",
+      "<b>외국인</b>: Outside (외) + Country (국) + Person (인) → Foreigner",
+      "<b>인구</b>: Person (인) + Mouth (구) → Population"
+    ]
+  },
+  { group:3, root:"자 (者)", gloss:"Doer / Person",
+    examples:["소비자","과학자","기자"],
+    breakdown:[
+      "<b>소비자</b>: Disperse (소) + Cost (비) + Person (자) → Consumer",
+      "<b>과학자</b>: Category (과) + Study (학) + Person (자) → Scientist",
+      "<b>기자</b>: Record/Write (기) + Person (자) → Reporter / Journalist"
+    ]
+  },
+  { group:3, root:"사 (師/士)", gloss:"Licensed Expert",
+    examples:["의사","변호사","교사"],
+    breakdown:[
+      "<b>의사</b>: Medicine (의) + Expert (사) → Doctor",
+      "<b>변호사</b>: Argue (변) + Protect (호) + Expert (사) → Lawyer / Attorney",
+      "<b>교사</b>: Teach (교) + Expert (사) → Teacher"
+    ]
+  },
+  { group:3, root:"가 (家)", gloss:"Expert / Household",
+    examples:["작가","가족","전문가"],
+    breakdown:[
+      "<b>작가</b>: Create (작) + Expert (가) → Writer / Author",
+      "<b>가족</b>: House/Family (가) + Clan (족) → Family",
+      "<b>전문가</b>: Solely/Focus (전) + Gate (문) + Expert (가) → Specialist / Expert"
+    ]
+  },
+  { group:3, root:"원 (員)", gloss:"Staff / Member",
+    examples:["직원","공무원","회원"],
+    breakdown:[
+      "<b>직원</b>: Duty (직) + Staff (원) → Employee / Staff member",
+      "<b>공무원</b>: Public (공) + Affair (무) + Staff (원) → Civil servant / Govt worker",
+      "<b>회원</b>: Gathering (회) + Member (원) → Member"
+    ]
+  },
+  { group:3, root:"민 (民)", gloss:"Citizen / People",
+    examples:["국민","시민","민주주의"],
+    breakdown:[
+      "<b>국민</b>: Country (국) + People (민) → Citizenry / General Public",
+      "<b>시민</b>: City (시) + People (민) → Citizen / Urbanite",
+      "<b>민주주의</b>: People (민) + Master (주) + Principle (주) + Will (의) → Democracy"
+    ]
+  },
+  { group:3, root:"국 (國)", gloss:"Country / Nation",
+    examples:["한국","외국","국가"],
+    breakdown:[
+      "<b>한국</b>: Great/Korean (한) + Country (국) → Korea",
+      "<b>외국</b>: Outside (외) + Country (국) → Foreign country",
+      "<b>국가</b>: Country (국) + House (가) → The State / Nation"
+    ]
+  },
+  { group:3, root:"부 (父)", gloss:"Father",
+    examples:["부모","부친","조부모"],
+    breakdown:[
+      "<b>부모</b>: Father (부) + Mother (모) → Parents",
+      "<b>부친</b>: Father (부) + Close/Parent (친) → Father (Formal/Honorific)",
+      "<b>조부모</b>: Ancestor (조) + Father (부) + Mother (모) → Grandparents"
+    ]
+  },
+  { group:3, root:"모 (母)", gloss:"Mother",
+    examples:["부모","모친","모국어"],
+    breakdown:[
+      "<b>부모</b>: Father (부) + Mother (모) → Parents",
+      "<b>모친</b>: Mother (모) + Close/Parent (친) → Mother (Formal/Honorific)",
+      "<b>모국어</b>: Mother (모) + Country (국) + Language (어) → Mother tongue / Native language"
+    ]
+  },
+  { group:3, root:"형 (兄)", gloss:"Older Brother",
+    examples:["형제","의형제","부형"],
+    breakdown:[
+      "<b>형제</b>: Older brother (형) + Younger brother (제) → Siblings / Brothers",
+      "<b>의형제</b>: Sworn/Righteous (의) + Older brother (형) + Younger brother (제) → Sworn brothers",
+      "<b>부형</b>: Father (부) + Older brother (형) → Guardians / Male elders"
+    ]
+  },
+  { group:3, root:"제 (弟)", gloss:"Younger Brother",
+    examples:["형제","제자","의형제"],
+    breakdown:[
+      "<b>형제</b>: Older brother (형) + Younger brother (제) → Siblings / Brothers",
+      "<b>제자</b>: Junior (제) + Child/Person (자) → Disciple / Student",
+      "<b>의형제</b>: Sworn/Righteous (의) + Older brother (형) + Younger brother (제) → Sworn brothers"
+    ]
+  },
+  { group:3, root:"남 (男)", gloss:"Male",
+    examples:["남자","남성","장남"],
+    breakdown:[
+      "<b>남자</b>: Male (남) + Person (자) → Man",
+      "<b>남성</b>: Male (남) + Nature/Gender (성) → Male / Masculine",
+      "<b>장남</b>: Elder/First (장) + Male (남) → Eldest son"
+    ]
+  },
+  { group:3, root:"여/녀 (女)", gloss:"Female",
+    examples:["여자","여성","남녀"],
+    breakdown:[
+      "<b>여자</b>: Female (여) + Person (자) → Woman (initial = 여)",
+      "<b>여성</b>: Female (여) + Nature/Gender (성) → Female (initial = 여)",
+      "<b>남녀</b>: Male (남) + Female (녀) → Men and women / Both sexes (middle = 녀)"
+    ]
+  },
+  { group:3, root:"친 (親)", gloss:"Parent / Close / Friendly",
+    examples:["친구","친절","친척"],
+    breakdown:[
+      "<b>친구</b>: Close/Parent (친) + Old friend (구) → Friend",
+      "<b>친절</b>: Close/Friendly (친) + Earnest/Thorough (절) → Kindness",
+      "<b>친척</b>: Close/Parent (친) + Relative (척) → Relative / Kin"
+    ]
+  },
+  { group:3, root:"동 (同)", gloss:"Same / Together",
+    examples:["동료","동시","동의"],
+    breakdown:[
+      "<b>동료</b>: Same (동) + Companion (료) → Colleague / Co-worker",
+      "<b>동시</b>: Same (동) + Time (시) → Simultaneous / Same time",
+      "<b>동의</b>: Same (동) + Will/Opinion (의) → Agreement / Consent"
+    ]
+  },
+  { group:3, root:"교 (敎)", gloss:"To Teach",
+    examples:["교육","교사","종교"],
+    breakdown:[
+      "<b>교육</b>: Teach (교) + Nurture/Raise (육) → Education",
+      "<b>교사</b>: Teach (교) + Expert (사) → Teacher",
+      "<b>종교</b>: Ancestral/Root (종) + Teach (교) → Religion"
+    ]
+  },
+  { group:3, root:"군 (軍)", gloss:"Military / Army",
+    examples:["군인","군대","군사"],
+    breakdown:[
+      "<b>군인</b>: Military (군) + Person (인) → Soldier",
+      "<b>군대</b>: Military (군) + Corps/Group (대) → Military / Armed forces",
+      "<b>군사</b>: Military (군) + Affair (사) → Military affairs / Intelligence"
+    ]
+  },
+  { group:3, root:"주 (主)", gloss:"Master / Owner / Main",
+    examples:["주인","주인공","주요"],
+    breakdown:[
+      "<b>주인</b>: Master (주) + Person (인) → Owner / Host",
+      "<b>주인공</b>: Master (주) + Person (인) + Public/Duke (공) → Main character / Protagonist",
+      "<b>주요</b>: Main (주) + Important (요) → Major / Main / Principal"
+    ]
+  },
+
+  // ── GROUP 4 ──────────────────────────────────────────────────────────────
+  { group:4, root:"심 (心)", gloss:"Mind / Heart",
+    examples:["관심","안심","중심"],
+    breakdown:[
+      "<b>관심</b>: Gate/Relation (관) + Heart/Mind (심) → Interest / Attention",
+      "<b>안심</b>: Safe/Comfort (안) + Heart/Mind (심) → Relief / Peace of mind",
+      "<b>중심</b>: Middle (중) + Heart/Mind (심) → Center / Core"
+    ]
+  },
+  { group:4, root:"신 (身)", gloss:"Body / Self",
+    examples:["자신","신체","신분"],
+    breakdown:[
+      "<b>자신</b>: Self (자) + Body/Self (신) → Oneself",
+      "<b>신체</b>: Body (신) + Body/Structure (체) → The Body / Physique",
+      "<b>신분</b>: Body (신) + Part/Divide (분) → Status / Rank"
+    ]
+  },
+  { group:4, root:"신 (信)", gloss:"Trust / Believe",
+    examples:["신뢰","자신감","신호"],
+    breakdown:[
+      "<b>신뢰</b>: Trust (신) + Rely (뢰) → Trust / Reliance",
+      "<b>자신감</b>: Self (자) + Believe (신) + Feeling (감) → Confidence",
+      "<b>신호</b>: Trust/Signal (신) + Sign/Mark (호) → Signal / Traffic light"
+    ]
+  },
+  { group:4, root:"정 (情)", gloss:"Emotion / Affection",
+    examples:["감정","열정","동정"],
+    breakdown:[
+      "<b>감정</b>: Feel (감) + Emotion (정) → Emotion / Feeling",
+      "<b>열정</b>: Hot/Heat (열) + Emotion (정) → Passion",
+      "<b>동정</b>: Same (동) + Emotion (정) → Sympathy / Pity"
+    ]
+  },
+  { group:4, root:"감 (感)", gloss:"To Feel",
+    examples:["감사","감동","감각"],
+    breakdown:[
+      "<b>감사</b>: Feel (감) + Thank (사) → Gratitude / Thanks",
+      "<b>감동</b>: Feel (감) + Move (동) → Being emotionally touched",
+      "<b>감각</b>: Feel (감) + Wake up/Sense (각) → Sense / Sensation"
+    ]
+  },
+  { group:4, root:"견 (見)", gloss:"See / View / Sight",
+    examples:["발견","의견","편견"],
+    breakdown:[
+      "<b>발견</b>: Emit/Launch (발) + See (견) → Discovery",
+      "<b>의견</b>: Intention/Mind (의) + View (견) → Opinion / Viewpoint",
+      "<b>편견</b>: Leaned/One-sided (편) + View (견) → Prejudice / Bias"
+    ]
+  },
+  { group:4, root:"문 (聞)", gloss:"To Hear / Rumor",
+    examples:["소문","신문","청문회"],
+    breakdown:[
+      "<b>소문</b>: Sound/Voice (소) + Hear (문) → Rumor / Hearsay",
+      "<b>신문</b>: New (신) + Hear (문) → Newspaper",
+      "<b>청문회</b>: Listen (청) + Hear (문) + Meeting (회) → Hearing / Audit"
+    ]
+  },
+  { group:4, root:"시 (視)", gloss:"Watch / Look",
+    examples:["시선","시청자","무시"],
+    breakdown:[
+      "<b>시선</b>: Watch (시) + Line (선) → Gaze / Eye contact",
+      "<b>시청자</b>: Watch (시) + Listen (청) + Person (자) → Viewer / Audience",
+      "<b>무시</b>: Without (무) + Watch (시) → Disregard / Ignore"
+    ]
+  },
+  { group:4, root:"청 (聽)", gloss:"To Listen",
+    examples:["청취자","시청자","청각"],
+    breakdown:[
+      "<b>청취자</b>: Listen (청) + Take/Adopt (취) + Person (자) → Radio listener",
+      "<b>시청자</b>: Watch (시) + Listen (청) + Person (자) → Viewer / Audience",
+      "<b>청각</b>: Listen (청) + Sense/Awakening (각) → Sense of hearing"
+    ]
+  },
+  { group:4, root:"화 (話)", gloss:"Speech / Talk",
+    examples:["대화","전화","화제"],
+    breakdown:[
+      "<b>대화</b>: Face/Respond (대) + Speech (화) → Conversation / Dialogue",
+      "<b>전화</b>: Electric (전) + Speech (화) → Telephone / Phone call",
+      "<b>화제</b>: Speech (화) + Topic/Subject (제) → Topic of conversation"
+    ]
+  },
+  { group:4, root:"어 (語)", gloss:"Language / Word",
+    examples:["한국어","언어","단어"],
+    breakdown:[
+      "<b>한국어</b>: Korean (한) + Country (국) + Language (어) → Korean language",
+      "<b>언어</b>: Speak (언) + Language (어) → Language",
+      "<b>단어</b>: Single/Unit (단) + Word/Language (어) → Word / Vocabulary item"
+    ]
+  },
+  { group:4, root:"문 (文)", gloss:"Writing / Culture",
+    examples:["문화","문장","문자"],
+    breakdown:[
+      "<b>문화</b>: Writing/Letters (문) + Transform (화) → Culture",
+      "<b>문장</b>: Writing (문) + Chapter/Clause (장) → Sentence",
+      "<b>문자</b>: Writing (문) + Child/Letter (자) → Text character / Alphabet"
+    ]
+  },
+  { group:4, root:"명 (名)", gloss:"Name / Famous",
+    examples:["성명","유명","명사"],
+    breakdown:[
+      "<b>성명</b>: Last name/Clan (성) + First name (명) → Full name",
+      "<b>유명</b>: Have/Exist (유) + Name (명) → Famous",
+      "<b>명사</b>: Name (명) + Word (사) → Noun"
+    ]
+  },
+  { group:4, root:"상 (想)", gloss:"Think / Imagine",
+    examples:["상상","예상","이상"],
+    breakdown:[
+      "<b>상상</b>: Think (상) + Image/Shape (상) → Imagination",
+      "<b>예상</b>: Before/In advance (예) + Think (상) → Forecast / Anticipation",
+      "<b>이상</b>: Different (이) + Think (상) → Ideal"
+    ]
+  },
+  { group:4, root:"의 (意)", gloss:"Will / Intention / Meaning",
+    examples:["의미","의견","주의"],
+    breakdown:[
+      "<b>의미</b>: Intention (의) + Taste/Flavor (미) → Meaning / Significance",
+      "<b>의견</b>: Intention (의) + View/Sight (견) → Opinion",
+      "<b>주의</b>: Pour/Inject (주) + Will/Mind (의) → Caution / Attention"
+    ]
+  },
+  { group:4, root:"안 (安)", gloss:"Safe / Comfort / Peace",
+    examples:["안전","안심","불안"],
+    breakdown:[
+      "<b>안전</b>: Safe (안) + Whole/Complete (전) → Safety",
+      "<b>안심</b>: Safe (안) + Mind (심) → Relief",
+      "<b>불안</b>: Not (불) + Safe (안) → Anxiety / Unrest"
+    ]
+  },
+  { group:4, root:"백 (百/白)", gloss:"Hundred / Clear / White",
+    examples:["백화점","고백","명백"],
+    breakdown:[
+      "<b>백화점</b>: Hundred (백) + Goods (화) + Shop (점) → Department store",
+      "<b>고백</b>: Tell/Inform (고) + Clear/Plain (백) → Confession",
+      "<b>명백</b>: Bright (명) + Clear/White (백) → Obvious / Plainly clear"
+    ]
+  },
+  { group:4, root:"표 (表)", gloss:"Surface / Express",
+    examples:["표현","대표","발표"],
+    breakdown:[
+      "<b>표현</b>: Surface/Display (표) + Appear (현) → Expression",
+      "<b>대표</b>: Substitute/Instead (대) + Display (표) → Representative / CEO",
+      "<b>발표</b>: Emit/Launch (발) + Display (표) → Announcement / Presentation"
+    ]
+  },
+  { group:4, root:"상 (相)", gloss:"Mutual / Face-to-Face",
+    examples:["상담","상대","상호"],
+    breakdown:[
+      "<b>상담</b>: Mutual (상) + Talk/Chat (담) → Counseling / Consultation",
+      "<b>상대</b>: Mutual (상) + Face/Respond (대) → Partner / Opponent",
+      "<b>상호</b>: Mutual (상) + Each other (호) → Mutual / Reciprocal"
+    ]
+  },
+
+  // ── GROUP 5 ──────────────────────────────────────────────────────────────
+  { group:5, root:"소 (所)", gloss:"Place / Office",
+    examples:["장소","안내소","매표소"],
+    breakdown:[
+      "<b>장소</b>: Open yard (장) + Place (소) → Place / Venue",
+      "<b>안내소</b>: Guide (안) + Inform (내) + Place (소) → Information desk",
+      "<b>매표소</b>: Sell (매) + Ticket (표) + Place (소) → Ticket office"
+    ]
+  },
+  { group:5, root:"실 (室)", gloss:"Room / Chamber",
+    examples:["화장실","교실","사무실"],
+    breakdown:[
+      "<b>화장실</b>: Change (화) + Adorn (장) + Room (실) → Restroom",
+      "<b>교실</b>: Teach (교) + Room (실) → Classroom",
+      "<b>사무실</b>: Affair (사) + Duty (무) + Room (실) → Office"
+    ]
+  },
+  { group:5, root:"관 (館)", gloss:"Building / Public Hall",
+    examples:["도서관","박물관","미술관"],
+    breakdown:[
+      "<b>도서관</b>: Picture (도) + Book (서) + Building (관) → Library",
+      "<b>박물관</b>: Wide/Ample (박) + Thing (물) + Building (관) → Museum",
+      "<b>미술관</b>: Beautiful (미) + Art (술) + Building (관) → Art gallery"
+    ]
+  },
+  { group:5, root:"원 (院/園)", gloss:"Institution / Garden",
+    examples:["병원","공원","학원"],
+    breakdown:[
+      "<b>병원</b>: Illness (병) + Public institution (원) → Hospital",
+      "<b>공원</b>: Public (공) + Garden (원) → Park",
+      "<b>학원</b>: Learn (학) + Institution (원) → Private academy / Cram school"
+    ]
+  },
+  { group:5, root:"장 (場)", gloss:"Open Space / Yard",
+    examples:["주차장","시장","극장"],
+    breakdown:[
+      "<b>주차장</b>: Park/Stay (주) + Car (차) + Yard (장) → Parking lot",
+      "<b>시장</b>: Trade/City (시) + Open yard (장) → Market",
+      "<b>극장</b>: Play/Drama (극) + Open yard (장) → Theater"
+    ]
+  },
+  { group:5, root:"점 (店)", gloss:"Shop / Store",
+    examples:["편의점","서점","백화점"],
+    breakdown:[
+      "<b>편의점</b>: Convenient (편) + Right/Fit (의) + Shop (점) → Convenience store",
+      "<b>서점</b>: Book (서) + Shop (점) → Bookstore",
+      "<b>백화점</b>: Hundred (백) + Goods (화) + Shop (점) → Department store"
+    ]
+  },
+  { group:5, root:"구 (口)", gloss:"Opening / Gate / Mouth",
+    examples:["출구","입구","비상구"],
+    breakdown:[
+      "<b>출구</b>: Go out (출) + Mouth/Opening (구) → Exit",
+      "<b>입구</b>: Enter (입) + Mouth/Opening (구) → Entrance",
+      "<b>비상구</b>: Not (비) + Normal (상) + Mouth/Opening (구) → Emergency exit"
+    ]
+  },
+  { group:5, root:"국 (局)", gloss:"Bureau / Office",
+    examples:["우체국","방송국","약국"],
+    breakdown:[
+      "<b>우체국</b>: Post (우) + System/Body (체) + Bureau (국) → Post office",
+      "<b>방송국</b>: Broadcast (방) + Send (송) + Bureau (국) → Broadcasting station",
+      "<b>약국</b>: Medicine (약) + Bureau (국) → Pharmacy"
+    ]
+  },
+  { group:5, root:"물 (物)", gloss:"Physical Object / Thing",
+    examples:["물건","동물","식물"],
+    breakdown:[
+      "<b>물건</b>: Physical thing (물) + Item/Affair (건) → Thing / Object",
+      "<b>동물</b>: Move (동) + Physical thing (물) → Animal",
+      "<b>식물</b>: Plant/Insert (식) + Physical thing (물) → Plant"
+    ]
+  },
+  { group:5, root:"품 (品)", gloss:"Product / Manufactured Goods",
+    examples:["제품","화장품","식품"],
+    breakdown:[
+      "<b>제품</b>: Manufacture (제) + Product (품) → Product / Manufactured item",
+      "<b>화장품</b>: Change (화) + Adorn (장) + Product (품) → Cosmetics",
+      "<b>식품</b>: Eat (식) + Product (품) → Food products"
+    ]
+  },
+  { group:5, root:"기 (機)", gloss:"Machine / Device",
+    examples:["세탁기","비행기","자판기"],
+    breakdown:[
+      "<b>세탁기</b>: Wash (세) + Cleanse (탁) + Machine (기) → Washing machine",
+      "<b>비행기</b>: Fly (비) + Go (행) + Machine (기) → Airplane",
+      "<b>자판기</b>: Self (자) + Sell (판) + Machine (기) → Vending machine"
+    ]
+  },
+  { group:5, root:"지 (紙)", gloss:"Paper",
+    examples:["휴지","편지지","신문지"],
+    breakdown:[
+      "<b>휴지</b>: Rest/Stop (휴) + Paper (지) → Tissue / Toilet paper",
+      "<b>편지지</b>: Letter (편) + Paper (지) + Paper (지) → Letter paper",
+      "<b>신문지</b>: New (신) + Hear (문) + Paper (지) → Newsprint / Newspaper sheet"
+    ]
+  },
+  { group:5, root:"차 (車)", gloss:"Wheeled Vehicle",
+    examples:["자동차","기차","열차"],
+    breakdown:[
+      "<b>자동차</b>: Self (자) + Move (동) + Vehicle (차) → Car / Automobile",
+      "<b>기차</b>: Steam/Vapor (기) + Vehicle (차) → Train",
+      "<b>열차</b>: Row/Line (열) + Vehicle (차) → Train (Subway/Rail line)"
+    ]
+  },
+  { group:5, root:"식 (食)", gloss:"Food / Eat",
+    examples:["음식","식사","한식"],
+    breakdown:[
+      "<b>음식</b>: Drink (음) + Eat/Food (식) → Food",
+      "<b>식사</b>: Eat (식) + Matter/Affair (사) → A Meal",
+      "<b>한식</b>: Korean (한) + Food (식) → Korean cuisine"
+    ]
+  },
+  { group:5, root:"방 (方)", gloss:"Direction / Method / Square",
+    examples:["방향","방면","방법"],
+    breakdown:[
+      "<b>방향</b>: Direction (방) + Toward (향) → Direction",
+      "<b>방면</b>: Direction (방) + Face/Side (면) → Bound for / Direction",
+      "<b>방법</b>: Direction/Square (방) + Law/Method (법) → Method / Way"
+    ]
+  },
+  { group:5, root:"본 (本)", gloss:"Root / Origin / Book",
+    examples:["기본","본질","일본"],
+    breakdown:[
+      "<b>기본</b>: Foundation (기) + Root (본) → Basics / Fundamentals",
+      "<b>본질</b>: Root (본) + Quality/Essence (질) → Essence / Core nature",
+      "<b>일본</b>: Sun (일) + Origin (본) → Japan"
+    ]
+  },
+  { group:5, root:"서 (書)", gloss:"Book / Document / Write",
+    examples:["서점","서류","교과서"],
+    breakdown:[
+      "<b>서점</b>: Book (서) + Shop (점) → Bookstore",
+      "<b>서류</b>: Write/Document (서) + Category/Type (류) → Documents / Paperwork",
+      "<b>교과서</b>: Teach (교) + Category (과) + Book (서) → Textbook"
+    ]
+  },
+  { group:5, root:"선 (線)", gloss:"Line / Route",
+    examples:["2호선","노선","직선"],
+    breakdown:[
+      "<b>2호선</b>: 2 + Number/Unit (호) + Line (선) → Subway Line 2",
+      "<b>노선</b>: Road/Path (노) + Line (선) → Route (Bus/Transit)",
+      "<b>직선</b>: Straight (직) + Line (선) → Straight line"
+    ]
+  },
+  { group:5, root:"선 (船)", gloss:"Ship / Boat",
+    examples:["선박","어선","우주선"],
+    breakdown:[
+      "<b>선박</b>: Ship (선) + Large vessel (박) → Shipping / Cargo ships",
+      "<b>어선</b>: Fish (어) + Ship (선) → Fishing boat",
+      "<b>우주선</b>: Space (우) + Universe (주) + Ship (선) → Spaceship"
+    ]
+  },
+  { group:5, root:"도 (圖)", gloss:"Map / Picture / Plan",
+    examples:["지도","도서관","의도"],
+    breakdown:[
+      "<b>지도</b>: Earth/Ground (지) + Picture/Map (도) → Map",
+      "<b>도서관</b>: Picture (도) + Book (서) + Building (관) → Library",
+      "<b>의도</b>: Will/Intention (의) + Plan/Map (도) → Intention / Purpose"
+    ]
+  },
+  { group:5, root:"대 (臺)", gloss:"Platform / Stand / Counter",
+    examples:["무대","침대","전망대"],
+    breakdown:[
+      "<b>무대</b>: Dance/Stage (무) + Platform (대) → Stage",
+      "<b>침대</b>: Sleep (침) + Platform (대) → Bed",
+      "<b>전망대</b>: View/Front (전) + Look out (망) + Platform (대) → Observation deck"
+    ]
+  },
+  { group:5, root:"부 (部)", gloss:"Part / Section / Unit",
+    examples:["부분","부서","전부"],
+    breakdown:[
+      "<b>부분</b>: Part (부) + Divide/Share (분) → Part / Section",
+      "<b>부서</b>: Part (부) + Office/Bureau (서) → Department",
+      "<b>전부</b>: All (전) + Part (부) → Everything / Entirely"
+    ]
+  },
+  { group:5, root:"집 (集)", gloss:"To Gather / Collect",
+    examples:["집중","수집","모집"],
+    breakdown:[
+      "<b>집중</b>: Gather (집) + Center (중) → Focus / Concentration",
+      "<b>수집</b>: Gather/Receive (수) + Collect (집) → Collection / Gathering items",
+      "<b>모집</b>: Recruit/Gather (모) + Collect (집) → Recruitment"
+    ]
+  },
+  { group:5, root:"화 (花)", gloss:"Flower",
+    examples:["화분","화초","생화"],
+    breakdown:[
+      "<b>화분</b>: Flower (화) + Pot (분) → Flowerpot",
+      "<b>화초</b>: Flower (화) + Grass/Plant (초) → Flowering plants",
+      "<b>생화</b>: Fresh/Live (생) + Flower (화) → Fresh flowers"
+    ]
+  },
+
+  // ── GROUP 6 ──────────────────────────────────────────────────────────────
+  { group:6, root:"학 (學)", gloss:"To Learn / Study",
+    examples:["학생","학교","과학"],
+    breakdown:[
+      "<b>학생</b>: Learn (학) + Person (생) → Student",
+      "<b>학교</b>: Learn (학) + Schoolhouse (교) → School",
+      "<b>과학</b>: Category (과) + Study (학) → Science"
+    ]
+  },
+  { group:6, root:"교 (校)", gloss:"School",
+    examples:["학교","교장","교감"],
+    breakdown:[
+      "<b>학교</b>: Learn (학) + Schoolhouse (교) → School",
+      "<b>교장</b>: School (교) + Chief (장) → Principal",
+      "<b>교감</b>: School (교) + Supervise (감) → Vice Principal"
+    ]
+  },
+  { group:6, root:"사 (事)", gloss:"Work / Affair / Matter",
+    examples:["회사","사고","사건"],
+    breakdown:[
+      "<b>회사</b>: Gather (회) + Affair/Agency (사) → Company",
+      "<b>사고</b>: Affair (사) + Trouble (고) → Accident",
+      "<b>사건</b>: Affair (사) + Case/Item (건) → Incident / Case"
+    ]
+  },
+  { group:6, root:"작 (作)", gloss:"To Make / Create / Work",
+    examples:["작가","작품","작업"],
+    breakdown:[
+      "<b>작가</b>: Create (작) + Expert (가) → Writer / Author",
+      "<b>작품</b>: Create (작) + Product (품) → Artwork / Piece of work",
+      "<b>작업</b>: Work (작) + Business (업) → Work / Operation / Task"
+    ]
+  },
+  { group:6, root:"업 (業)", gloss:"Business / Profession / Work",
+    examples:["직업","사업","졸업"],
+    breakdown:[
+      "<b>직업</b>: Duty/Job (직) + Profession (업) → Job / Occupation",
+      "<b>사업</b>: Affair (사) + Business (업) → Business",
+      "<b>졸업</b>: Finish (졸) + Work/Study (업) → Graduation"
+    ]
+  },
+  { group:6, root:"법 (法)", gloss:"Law / Method / Way",
+    examples:["방법","법률","문법"],
+    breakdown:[
+      "<b>방법</b>: Direction (방) + Method (법) → Method / Way",
+      "<b>법률</b>: Law (법) + Rule (률) → Law / Act / Statute",
+      "<b>문법</b>: Writing (문) + Law (법) → Grammar"
+    ]
+  },
+  { group:6, root:"성 (成)", gloss:"Achieve / Become / Grow",
+    examples:["성공","완성","성장"],
+    breakdown:[
+      "<b>성공</b>: Achieve (성) + Merit (공) → Success",
+      "<b>완성</b>: Complete (완) + Achieve (성) → Completion",
+      "<b>성장</b>: Grow (성) + Long/Extend (장) → Growth / Development"
+    ]
+  },
+  { group:6, root:"생 (生)", gloss:"Life / Born / Fresh",
+    examples:["생일","생활","생물"],
+    breakdown:[
+      "<b>생일</b>: Born (생) + Day (일) → Birthday",
+      "<b>생활</b>: Live (생) + Lively/Move (활) → Daily life / Lifestyle",
+      "<b>생물</b>: Live (생) + Thing (물) → Living organism / Creature"
+    ]
+  },
+  { group:6, root:"발 (發)", gloss:"Emit / Launch / Start",
+    examples:["출발","개발","발견"],
+    breakdown:[
+      "<b>출발</b>: Go out (출) + Emit/Launch (발) → Departure",
+      "<b>개발</b>: Open up (개) + Launch forth (발) → Development",
+      "<b>발견</b>: Emit (발) + See (견) → Discovery"
+    ]
+  },
+  { group:6, root:"력 (力)", gloss:"Power / Force / Ability",
+    examples:["능력","노력","강력"],
+    breakdown:[
+      "<b>능력</b>: Capable (능) + Power (력) → Ability / Skill",
+      "<b>노력</b>: Labor/Strive (노) + Power (력) → Effort / Hard work",
+      "<b>강력</b>: Strong (강) + Power (력) → Powerful / Strong"
+    ]
+  },
+  { group:6, root:"정 (政)", gloss:"Government / Politics",
+    examples:["정부","정치","정책"],
+    breakdown:[
+      "<b>정부</b>: Govern (정) + Office (부) → Government",
+      "<b>정치</b>: Govern (정) + Rule/Manage (치) → Politics",
+      "<b>정책</b>: Govern (정) + Plan/Scheme (책) → Policy"
+    ]
+  },
+  { group:6, root:"공 (公)", gloss:"Public / Common",
+    examples:["공원","공무원","공공"],
+    breakdown:[
+      "<b>공원</b>: Public (공) + Garden (원) → Park",
+      "<b>공무원</b>: Public (공) + Affair (무) + Staff (원) → Civil servant",
+      "<b>공공</b>: Public (공) + Public (공) → Public / Communal"
+    ]
+  },
+  { group:6, root:"직 (職)", gloss:"Job / Duty / Position",
+    examples:["직업","직원","직무"],
+    breakdown:[
+      "<b>직업</b>: Duty (직) + Profession (업) → Job / Occupation",
+      "<b>직원</b>: Duty (직) + Staff (원) → Employee / Staff member",
+      "<b>직무</b>: Duty (직) + Affair/Task (무) → Job duty / Obligation"
+    ]
+  },
+  { group:6, root:"과 (科)", gloss:"Category / Department",
+    examples:["과학","과목","내과"],
+    breakdown:[
+      "<b>과학</b>: Category (과) + Study (학) → Science",
+      "<b>과목</b>: Category (과) + Item (목) → Subject (in school)",
+      "<b>내과</b>: Inside (내) + Department (과) → Internal Medicine"
+    ]
+  },
+  { group:6, root:"실 (實)", gloss:"Reality / Fruit / Truth",
+    examples:["현실","실제","실화"],
+    breakdown:[
+      "<b>현실</b>: Present/Manifest (현) + Reality (실) → Reality",
+      "<b>실제</b>: Reality (실) + Border/Time (제) → Truth / Actual state",
+      "<b>실화</b>: Truth (실) + Talk/Story (화) → True story"
+    ]
+  },
+  { group:6, root:"제 (制/製)", gloss:"System / Produce",
+    examples:["제도","제품","제작"],
+    breakdown:[
+      "<b>제도</b>: System (제) + Rule/Degree (도) → System / Institution",
+      "<b>제품</b>: Manufacture (제) + Product (품) → Product / Manufactured item",
+      "<b>제작</b>: Manufacture (제) + Make (작) → Production / Making"
+    ]
+  },
+  { group:6, root:"계 (計)", gloss:"Plan / Count / Calculate",
+    examples:["계획","시계","계산"],
+    breakdown:[
+      "<b>계획</b>: Calculate (계) + Draw line (획) → Plan",
+      "<b>시계</b>: Time (시) + Gauge (계) → Clock / Watch",
+      "<b>계산</b>: Calculate (계) + Count (산) → Calculation / Check / Bill"
+    ]
+  },
+  { group:6, root:"결 (結)", gloss:"Tie / Bind / Conclude",
+    examples:["결과","결정","결혼"],
+    breakdown:[
+      "<b>결과</b>: Tie (결) + Fruit (과) → Result / Outcome",
+      "<b>결정</b>: Tie (결) + Fix (정) → Decision",
+      "<b>결혼</b>: Tie (결) + Marriage (혼) → Marriage"
+    ]
+  },
+  { group:6, root:"과 (果)", gloss:"Fruit / Result",
+    examples:["결과","효과","성과"],
+    breakdown:[
+      "<b>결과</b>: Tie (결) + Fruit (과) → Result / Outcome",
+      "<b>효과</b>: Efficacy/Mimic (효) + Fruit (과) → Effect / Effectiveness",
+      "<b>성과</b>: Achieve (성) + Fruit (과) → Result / Performance achievement"
+    ]
+  },
+  { group:6, root:"조 (條)", gloss:"Condition / Article / Clause",
+    examples:["조건","조항","조례"],
+    breakdown:[
+      "<b>조건</b>: Clause (조) + Item (건) → Condition / Qualification",
+      "<b>조항</b>: Clause (조) + Item/Paragraph (항) → Clause / Article",
+      "<b>조례</b>: Clause (조) + Custom/Rule (례) → Ordinance / Local regulation"
+    ]
+  },
+  { group:6, root:"해 (解)", gloss:"Solve / Untie / Loosen",
+    examples:["해결","이해","해고"],
+    breakdown:[
+      "<b>해결</b>: Untie (해) + Tie/Conclude (결) → Solution / Settlement",
+      "<b>이해</b>: Profit (이) + Untie/Loosen (해) → Understanding",
+      "<b>해고</b>: Loosen (해) + Dismiss (고) → Layoff / Firing"
+    ]
+  },
+  { group:6, root:"변 (變)", gloss:"Change / Alter",
+    examples:["변화","변경","변동"],
+    breakdown:[
+      "<b>변화</b>: Change (변) + Transform (화) → Change / Transformation",
+      "<b>변경</b>: Change (변) + Alter/Swap (경) → Alteration / Modification",
+      "<b>변동</b>: Change (변) + Move (동) → Fluctuation / Shift"
+    ]
+  },
+  { group:6, root:"화 (化)", gloss:"Change / Transformation / -ize",
+    examples:["문화","자동화","서구화"],
+    breakdown:[
+      "<b>문화</b>: Writing (문) + Transform (화) → Culture",
+      "<b>자동화</b>: Self (자) + Move (동) + Transform (화) → Automation",
+      "<b>서구화</b>: West (서) + Europe (구) + Transform (화) → Westernization"
+    ]
+  },
+  { group:6, root:"합 (合)", gloss:"Fit / Combine / Agree",
+    examples:["합격","종합","합의"],
+    breakdown:[
+      "<b>합격</b>: Fit/Combine (합) + Standard (격) → Passing (an exam/test)",
+      "<b>종합</b>: Total/Synthesize (종) + Combine (합) → Synthesis / Comprehensive",
+      "<b>합의</b>: Agree (합) + Opinion/Will (의) → Agreement / Mutual consent"
+    ]
+  },
+  { group:6, root:"선 (選)", gloss:"Choose / Select",
+    examples:["선택","선수","선거"],
+    breakdown:[
+      "<b>선택</b>: Select (선) + Pick out (택) → Choice / Option",
+      "<b>선수</b>: Select (선) + Hand/Expert (수) → Athlete / Sports player",
+      "<b>선거</b>: Select (선) + Raise up (거) → Election"
+    ]
+  },
+  { group:6, root:"시 (始)", gloss:"Begin / Start",
+    examples:["시작","시초","개시"],
+    breakdown:[
+      "<b>시작</b>: Begin (시) + Make/Work (작) → Start / Commencement",
+      "<b>시초</b>: Begin (시) + Beginning/Grass (초) → Inception / Beginning",
+      "<b>개시</b>: Open (개) + Begin (시) → Opening / Launching (e.g. a business)"
+    ]
+  },
+  { group:6, root:"종 (終)", gloss:"End / Finish / Terminate",
+    examples:["최종","종료","종점"],
+    breakdown:[
+      "<b>최종</b>: Most (최) + End (종) → Final / Ultimate",
+      "<b>종료</b>: End (종) + Finish (료) → End / Termination / Close",
+      "<b>종점</b>: End (종) + Point (점) → Terminus / Last stop"
+    ]
+  },
+  { group:6, root:"연 (連)", gloss:"Connect / Continue / Lead",
+    examples:["연락","연속","연휴"],
+    breakdown:[
+      "<b>연락</b>: Connect (연) + Tie/Bind (락) → Contact / Communication",
+      "<b>연속</b>: Continue (연) + Connect/Continue (속) → Continuity / Consecutive",
+      "<b>연휴</b>: Continue (연) + Rest (휴) → Long weekend / Consecutive holidays"
+    ]
+  },
+
+  // ── GROUP 7 ──────────────────────────────────────────────────────────────
+  { group:7, root:"대 (大)", gloss:"Big / Great",
+    examples:["대학교","대통령","대다수"],
+    breakdown:[
+      "<b>대학교</b>: Big (대) + Learn (학) + School (교) → University",
+      "<b>대통령</b>: Great (대) + Govern (통) + Command (령) → President",
+      "<b>대다수</b>: Big (대) + Many (다) + Number (수) → The vast majority"
+    ]
+  },
+  { group:7, root:"소 (小)", gloss:"Small",
+    examples:["최소","소형","축소"],
+    breakdown:[
+      "<b>최소</b>: Most (최) + Small (소) → Minimum",
+      "<b>소형</b>: Small (소) + Model/Shape (형) → Small-sized / Compact",
+      "<b>축소</b>: Shrink (축) + Small (소) → Reduction / Downsizing"
+    ]
+  },
+  { group:7, root:"중 (中)", gloss:"Middle / Center",
+    examples:["중간","중국","집중"],
+    breakdown:[
+      "<b>중간</b>: Middle (중) + Between (간) → Middle / Center",
+      "<b>중국</b>: Middle (중) + Country (국) → China",
+      "<b>집중</b>: Gather (집) + Center (중) → Focus / Concentration"
+    ]
+  },
+  { group:7, root:"고 (高)", gloss:"High",
+    examples:["최고","고등학교","고급"],
+    breakdown:[
+      "<b>최고</b>: Most (최) + High (고) → The best / Maximum",
+      "<b>고등학교</b>: High (고) + Rank (등) + Learn (학) + School (교) → [고등 = high-rank] → High School",
+      "<b>고급</b>: High (고) + Grade/Rank (급) → High-class / Luxury / Premium"
+    ]
+  },
+  { group:7, root:"저 (低)", gloss:"Low",
+    examples:["최저","저렴","저하"],
+    breakdown:[
+      "<b>최저</b>: Most (최) + Low (저) → Lowest / Minimum",
+      "<b>저렴</b>: Low (저) + Cheap (렴) → Inexpensive / Cheap",
+      "<b>저하</b>: Low (저) + Down (하) → Deterioration / Drop / Fall"
+    ]
+  },
+  { group:7, root:"다 (多)", gloss:"Many / Much",
+    examples:["다수","다양","다용도"],
+    breakdown:[
+      "<b>다수</b>: Many (다) + Number (수) → Many / Majority",
+      "<b>다양</b>: Many (다) + Shape/Pattern (양) → Variety / Diverse",
+      "<b>다용도</b>: Many (다) + Use (용) + Degree/Way (도) → Multipurpose"
+    ]
+  },
+  { group:7, root:"소 (少)", gloss:"Few / Little",
+    examples:["소수","감소","소년"],
+    breakdown:[
+      "<b>소수</b>: Few (소) + Number (수) → Few / Minority",
+      "<b>감소</b>: Decrease (감) + Few (소) → Decrease / Decline",
+      "<b>소년</b>: Few/Young (소) + Year (년) → Boy / Youth"
+    ]
+  },
+  { group:7, root:"신 (新)", gloss:"New",
+    examples:["신제품","신세대","신문"],
+    breakdown:[
+      "<b>신제품</b>: New (신) + Make (제) + Product (품) → New release / New product",
+      "<b>신세대</b>: New (신) + Generation (세) + Era (대) → New/Younger generation",
+      "<b>신문</b>: New (신) + Hear (문) → Newspaper"
+    ]
+  },
+  { group:7, root:"구 (舊)", gloss:"Old / Former",
+    examples:["구형","구세대","구시가지"],
+    breakdown:[
+      "<b>구형</b>: Old (구) + Model (형) → Old model",
+      "<b>구세대</b>: Old (구) + Generation (세) + Era (대) → Older generation",
+      "<b>구시가지</b>: Old (구) + City (시) + Street (가) + Land (지) → Old town / Historic center"
+    ]
+  },
+  { group:7, root:"무 (無)", gloss:"Without / Non-",
+    examples:["무료","무인","무조건"],
+    breakdown:[
+      "<b>무료</b>: Without (무) + Fee (료) → Free of charge",
+      "<b>무인</b>: Without (무) + Person (인) → Unmanned / Self-service",
+      "<b>무조건</b>: Without (무) + Clause (조) + Item (건) → Unconditionally"
+    ]
+  },
+  { group:7, root:"불/부 (不)", gloss:"Not / Un- / Non-",
+    examples:["불가능","부당","불친절"],
+    breakdown:[
+      "<b>불가능</b>: Not (불) + Possible (가) + Able (능) → Impossible",
+      "<b>부당</b>: Not (부) + Right/Proper (당) → Unfair / Wrongful",
+      "<b>불친절</b>: Not (불) + Close/Friendly (친) + Earnest (절) → Unkind / Impolite"
+    ]
+  },
+  { group:7, root:"최 (最)", gloss:"Most / -est",
+    examples:["최고","최신","최초"],
+    breakdown:[
+      "<b>최고</b>: Most (최) + High (고) → The best / Maximum",
+      "<b>최신</b>: Most (최) + New (신) → Latest / Up-to-date",
+      "<b>최초</b>: Most (최) + Beginning (초) → The very first / Initial"
+    ]
+  },
+  { group:7, root:"특 (特)", gloss:"Special / Unique",
+    examples:["특별","특징","특기"],
+    breakdown:[
+      "<b>특별</b>: Special (특) + Separate (별) → Special",
+      "<b>특징</b>: Special (특) + Sign/Token (징) → Feature / Characteristic",
+      "<b>특기</b>: Special (특) + Skill (기) → Specialty / Special talent"
+    ]
+  },
+  { group:7, root:"공 (空)", gloss:"Empty / Sky",
+    examples:["공항","공석","공간"],
+    breakdown:[
+      "<b>공항</b>: Sky (공) + Harbor (항) → Airport",
+      "<b>공석</b>: Empty (공) + Seat (석) → Vacancy / Empty seat",
+      "<b>공간</b>: Empty (공) + Between (간) → Space / Room"
+    ]
+  },
+  { group:7, root:"정 (定)", gloss:"Fix / Decide / Regular",
+    examples:["결정","예정","정기"],
+    breakdown:[
+      "<b>결정</b>: Tie (결) + Fix (정) → Decision",
+      "<b>예정</b>: Before (예) + Fix (정) → Schedule / Plan",
+      "<b>정기</b>: Regular (정) + Period (기) → Periodic / Regular"
+    ]
+  },
+  { group:7, root:"정 (正)", gloss:"Correct / Right / Exact",
+    examples:["정상","정확","정직"],
+    breakdown:[
+      "<b>정상</b>: Right (정) + Normal/Constant (상) → Normal",
+      "<b>정확</b>: Right (정) + Firm/Solid (확) → Accurate / Precise",
+      "<b>정직</b>: Right (정) + Straight (직) → Honest / Upright"
+    ]
+  },
+  { group:7, root:"중 (重)", gloss:"Heavy / Important",
+    examples:["중요","중량","신중"],
+    breakdown:[
+      "<b>중요</b>: Important (중) + Vital (요) → Important",
+      "<b>중량</b>: Heavy (중) + Measure/Mass (량) → Weight",
+      "<b>신중</b>: Prudent (신) + Heavy (중) → Caution / Prudence"
+    ]
+  },
+  { group:7, root:"경 (輕)", gloss:"Light (Weight)",
+    examples:["경차","경량","경솔"],
+    breakdown:[
+      "<b>경차</b>: Light (경) + Vehicle (차) → Compact car",
+      "<b>경량</b>: Light (경) + Mass/Measure (량) → Lightweight",
+      "<b>경솔</b>: Light (경) + Hasty/Rate (솔) → Careless / Frivolous"
+    ]
+  },
+  { group:7, root:"강 (强)", gloss:"Strong / Powerful",
+    examples:["강력","강화","강제"],
+    breakdown:[
+      "<b>강력</b>: Strong (강) + Power (력) → Powerful / Strong",
+      "<b>강화</b>: Strong (강) + Transform (화) → Strengthening / Reinforcement",
+      "<b>강제</b>: Strong (강) + System/Control (제) → Compulsion / Force"
+    ]
+  },
+  { group:7, root:"약 (弱)", gloss:"Weak",
+    examples:["약점","약화","취약"],
+    breakdown:[
+      "<b>약점</b>: Weak (약) + Point (점) → Weakness / Weak point",
+      "<b>약화</b>: Weak (약) + Transform (화) → Weakening / Weakener",
+      "<b>취약</b>: Crisp/Brittle (취) + Weak (약) → Vulnerability / Vulnerable"
+    ]
+  },
+  { group:7, root:"가 (價)", gloss:"Price / Value",
+    examples:["가격","가치","평가"],
+    breakdown:[
+      "<b>가격</b>: Price (가) + Standard (격) → Price / Cost",
+      "<b>가치</b>: Value (가) + Value/Worth (치) → Value / Worth",
+      "<b>평가</b>: Appraise (평) + Price/Value (가) → Evaluation / Appraisal"
+    ]
+  },
+  { group:7, root:"금 (金)", gloss:"Money / Gold / Fee",
+    examples:["요금","현금","세금"],
+    breakdown:[
+      "<b>요금</b>: Require (요) + Money (금) → Fee / Fare",
+      "<b>현금</b>: Current (현) + Money (금) → Cash",
+      "<b>세금</b>: Tax (세) + Money (금) → Tax"
+    ]
+  },
+  { group:7, root:"비 (費)", gloss:"Expense / Cost",
+    examples:["소비","교통비","비용"],
+    breakdown:[
+      "<b>소비</b>: Melt away (소) + Cost (비) → Consumption / Spending",
+      "<b>교통비</b>: Cross (교) + Through (통) + Cost (비) → [교통 = transit] → Transit fare",      "<b>비용</b>: Expense (비) + Use (용) → Cost / Expense"
+    ]
+  },
+  { group:7, root:"재 (財)", gloss:"Wealth / Property / Assets",
+    examples:["재산","재정","재화"],
+    breakdown:[
+      "<b>재산</b>: Wealth (재) + Property (산) → Property / Wealth / Fortune",
+      "<b>재정</b>: Wealth (재) + Manage (정) → Finances / Public finance",
+      "<b>재화</b>: Wealth (재) + Goods (화) → Commodities / Material goods"
+    ]
+  },
+  { group:7, root:"상 (商)", gloss:"Commerce / Trade / Shop",
+    examples:["상품","상점","상업"],
+    breakdown:[
+      "<b>상품</b>: Trade (상) + Product (품) → Goods / Merchandise",
+      "<b>상점</b>: Trade (상) + Shop (점) → Shop / Store",
+      "<b>상업</b>: Trade (상) + Profession (업) → Commerce / Business trade"
+    ]
+  },
+  { group:7, root:"수 (收)", gloss:"Receive / Income / Gather",
+    examples:["수입","수집","수익"],
+    breakdown:[
+      "<b>수입</b>: Receive (수) + Enter (입) → Income / Revenue",
+      "<b>수집</b>: Gather (수) + Collect (집) → Collection / Gathering",
+      "<b>수익</b>: Receive (수) + Profit (익) → Profit / Earnings"
+    ]
+  },
+  { group:7, root:"지 (支)", gloss:"Pay / Support / Branch",
+    examples:["지출","지원","지급"],
+    breakdown:[
+      "<b>지출</b>: Pay/Disburse (지) + Go out (출) → Expenses / Spending",
+      "<b>지원</b>: Support (지) + Help (원) → Support / Application",
+      "<b>지급</b>: Disburse (지) + Give (급) → Payment / Provision"
+    ]
+  },
+  { group:7, root:"이/리 (利)", gloss:"Benefit / Profit",
+    examples:["이용","이익","편리"],
+    breakdown:[
+      "<b>이용</b>: Benefit (이) + Use (용) → Utilization / Use (initial = 이)",
+      "<b>이익</b>: Benefit (이) + Profit (익) → Profit / Advantage (initial = 이)",
+      "<b>편리</b>: Comfort (편) + Benefit (리) → Convenience (end = 리)"
+    ]
+  },
+  { group:7, root:"성 (性)", gloss:"Nature / Quality / -ity",
+    examples:["가능성","중요성","남성"],
+    breakdown:[
+      "<b>가능성</b>: Possible (가) + Able (능) + Nature (성) → [가능 = possible] → Possibility / Potential",
+      "<b>중요성</b>: Weighty (중) + Vital (요) + Nature (성) → [중요 = important] → Importance",
+      "<b>남성</b>: Male (남) + Nature (성) → Male / Masculine"
+    ]
+  },
+  { group:7, root:"증 (證)", gloss:"Proof / Evidence / Token",
+    examples:["증명","학생증","영수증"],
+    breakdown:[
+      "<b>증명</b>: Proof (증) + Clear (명) → Proof / Verification",
+      "<b>학생증</b>: Learn (학) + Person (생) + Token (증) → [학생 = student] → Student ID card",
+      "<b>영수증</b>: Receive (영) + Collect (수) + Evidence (증) → [영수 = receipt-of] → Receipt"
+    ]
+  },
+  { group:7, root:"적 (的)", gloss:"Target / Adjective Suffix / -ical",
+    examples:["목적","문화적","개인적"],
+    breakdown:[
+      "<b>목적</b>: Eye (목) + Target (적) → Purpose / Goal",
+      "<b>문화적</b>: Writing (문) + Transform (화) + Suffix (적) → [문화 = culture] → Cultural",
+      "<b>개인적</b>: Unit (개) + Person (인) + Suffix (적) → [개인 = individual] → Personal / Private"
+    ]
+  },
+  { group:7, root:"통 (統)", gloss:"Unify / Govern / Interconnect",
+    examples:["대통령","전통","통계"],
+    breakdown:[
+      "<b>대통령</b>: Great (대) + Govern (통) + Command (령) → President",
+      "<b>전통</b>: Pass down (전) + Unify/System (통) → Tradition",
+      "<b>통계</b>: Unify/Sum (통) + Calculate (계) → Statistics"
+    ]
+  },
+  { group:7, root:"전 (全)", gloss:"All / Whole / Complete",
+    examples:["전부","완전","전국"],
+    breakdown:[
+      "<b>전부</b>: All (전) + Part (부) → Everything / Entirety",
+      "<b>완전</b>: Finish (완) + Whole (전) → Complete / Absolute",
+      "<b>전국</b>: Whole (전) + Country (국) → Nationwide / Countrywide"
+    ]
+  },
+  { group:7, root:"상 (常)", gloss:"Normal / Constant / Always",
+    examples:["정상","상식","일상"],
+    breakdown:[
+      "<b>정상</b>: Right (정) + Normal (상) → Normal / Regularity",
+      "<b>상식</b>: Normal (상) + Knowledge (식) → Common sense",
+      "<b>일상</b>: Day (일) + Normal (상) → Daily routine / Everyday life"
+    ]
+  },
+  // 12 additions
+  { group:1, root:"선 (先)", gloss:"First / Ahead",
+    examples:["선생","우선","선배"],
+    breakdown:[
+      "<b>선생</b>: Ahead (선) + Born (생) → Teacher",
+      "<b>우선</b>: Superior (우) + First (선) → First of all / Priority",
+      "<b>선배</b>: Ahead (선) + Row/Generation (배) → Senior (at work/school)"
+    ]
+  },
+  { group:1, root:"관 (關)", gloss:"Relation / Connect / Gate",
+    examples:["관계","관련","관문"],
+    breakdown:[
+      "<b>관계</b>: Connect (관) + Tie/Bind (계) → Relationship / Connection",
+      "<b>관련</b>: Connect (관) + Chain/Link (련) → Relation / Association",
+      "<b>관문</b>: Gate (관) + Door (문) → Gateway / Hurdle"
+    ]
+  },
+  { group:2, root:"속 (速)", gloss:"Fast / Speed",
+    examples:["속도","고속","가속"],
+    breakdown:[
+      "<b>속도</b>: Speed (속) + Degree (도) → Speed / Velocity",
+      "<b>고속</b>: High (고) + Speed (속) → High-speed / Express",
+      "<b>가속</b>: Add (가) + Speed (속) → Acceleration"
+    ]
+  },
+  { group:3, root:"청 (靑)", gloss:"Blue / Green / Youth",
+    examples:["청년","청소년","청정"],
+    breakdown:[
+      "<b>청년</b>: Youth/Green (청) + Year (년) → Youth / Young adult",
+      "<b>청소년</b>: Youth (청) + Few (소) + Year (년) → Adolescent / Teenager",
+      "<b>청정</b>: Blue/Clear (청) + Clean (정) → Clean / Pure / Untainted"
+    ]
+  },
+  { group:4, root:"비 (比)", gloss:"To Compare / Ratio",
+    examples:["비교","비율","비례"],
+    breakdown:[
+      "<b>비교</b>: Compare (비) + Cross/Match (교) → Comparison",
+      "<b>비율</b>: Compare (비) + Rate/Rule (율) → Ratio / Percentage",
+      "<b>비례</b>: Compare (비) + Standard/Row (례) → Proportion"
+    ]
+  },
+  { group:4, root:"음 (音)", gloss:"Sound / Tone / Voice",
+    examples:["음악","발음","녹음"],
+    breakdown:[
+      "<b>음악</b>: Sound (음) + Joy/Music (악) → Music",
+      "<b>발음</b>: Emit (발) + Sound (음) → Pronunciation",
+      "<b>녹음</b>: Record (녹) + Sound (음) → Audio recording"
+    ]
+  },
+  { group:4, root:"악/락 (樂)", gloss:"Music / Joy / Pleasure",
+    examples:["음악","오락","안락"],
+    breakdown:[
+      "<b>음악</b>: Sound (음) + Music (악) → Music (end = 악)",
+      "<b>오락</b>: Enjoy (오) + Joy (락) → Entertainment / Recreation (end = 락)",
+      "<b>안락</b>: Comfortable (안) + Joy/Pleasure (락) → Cozy / Comfortable (end = 락)"
+    ]
+  },
+  { group:5, root:"태 (態)", gloss:"Form / Attitude / Condition",
+    examples:["상태","태도","형태"],
+    breakdown:[
+      "<b>상태</b>: Shape/Appearance (상) + Condition (태) → State / Condition",
+      "<b>태도</b>: Attitude (태) + Way/Degree (도) → Attitude / Demeanor",
+      "<b>형태</b>: Shape/Mold (형) + Form (태) → Shape / Form / Type"
+    ]
+  },
+  { group:6, root:"방 (防)", gloss:"Defend / Prevent / Guard",
+    examples:["예방","방어","소방서"],
+    breakdown:[
+      "<b>예방</b>: Beforehand (예) + Prevent (방) → Prevention / Prophylaxis",
+      "<b>방어</b>: Defend (방) + Control/Drive (어) → Defense",
+      "<b>소방서</b>: Extinguish (소) + Prevent (방) + Bureau (서) → Fire station"
+    ]
+  },
+];
+
+const NOTES = {
+  "가":{sino:[["家","household/expert","작가 writer, 가족 family"],["加","add","추가 addition, 가속 accelerate"],["價","price","가격 price, 정가 list price"],["歌","song","가수 singer, 가사 lyrics"],["可","possible","가능 possible, 허가 permission"]]},
+  "인":{sino:[["人","person","인간 human, 외국인 foreigner"],["引","pull/draw","할인 discount, 인상 price hike"],["因","cause","원인 cause, 인과 cause and effect"]]},
+  "수":{sino:[["水","water","수영 swimming, 생수 bottled water"],["收","receive/gather","수입 income, 수집 collection"],["數","number","숫자 numeral, 수학 math"],["手","hand/skill","가수 singer, 선수 athlete"],["修","cultivate/repair","수리 repair, 수업 lesson"]]},
+  "정":{sino:[["情","emotion","감정 emotion, 열정 passion"],["政","govern","정부 government, 정치 politics"],["定","fix/decide","결정 decision, 예정 schedule"],["正","correct","정확 accurate, 정상 normal"],["程","degree/extent","과정 process, 정도 degree"],["精","refined/spirit","정신 spirit, 정밀 precision"]]},
+  "사":{sino:[["師/士","licensed expert","의사 doctor, 교사 teacher"],["事","affair/matter","사건 incident, 사고 accident"],["社","company/society","회사 company, 사회 society"],["使","use/envoy","사용 use, 대사 ambassador"],["死","death","사망 death, 사형 death penalty"]]},
+  "도":{sino:[["到","arrive","도착 arrival, 도달 attainment"],["圖","map/picture","지도 map, 도서관 library"],["度","degree/measure","온도 temperature, 속도 speed"],["道","road/way/province","도로 road, 수도 capital"]]},
+  "기":{sino:[["氣","air/energy","공기 air, 기분 mood"],["機","machine","비행기 airplane, 세탁기 washer"],["期","period/term","학기 semester, 기간 duration"],["記","record/write","일기 diary, 기자 reporter"],["起","rise/start","기상 waking, 제기 raising (issue)"]]},
+  "전":{sino:[["前","before/front","오전 a.m., 전반 first half"],["全","whole/complete","전부 everything, 완전 complete"],["電","electricity","전기 electricity, 전화 phone"],["傳","transmit/pass down","전통 tradition, 전달 delivery"],["戰","war/battle","전쟁 war, 작전 operation"]]},
+  "상":{sino:[["上","up/above","상반기 first half, 이상 above"],["想","think/imagine","상상 imagination, 예상 forecast"],["相","mutual/face","상담 counseling, 상대 opponent"],["商","commerce","상품 goods, 상점 shop"],["常","normal/constant","정상 normal, 상식 common sense"],["賞","prize/reward","상금 prize money, 수상 award"],["傷","wound/injury","부상 injury, 상처 wound"]]},
+  "자":{sino:[["者","doer/person","소비자 consumer, 기자 reporter"],["字","letter/character","글자 letter, 한자 hanja"],["自","self","자신 oneself, 자동 automatic"]]},
+  "장":{sino:[["場","open yard","주차장 parking lot, 시장 market"],["長","long/chief","사장 president, 교장 principal"],["章","chapter/badge","문장 sentence, 도장 stamp"],["將","general/about to","장군 general, 장래 future"]]},
+  "성":{sino:[["成","achieve/become","성공 success, 완성 completion"],["性","nature/-ity","가능성 possibility, 남성 male"],["城","castle/wall","성벽 rampart, 만리장성 Great Wall"],["聲","sound/voice","음성 voice, 성악 vocal music"],["省","reflect/province","반성 self-reflection"]]},
+  "해":{sino:[["解","solve/untie","해결 solution, 이해 understanding"]],native:[["","sun","햇빛 sunlight, 해돋이 sunrise"],["","year","올해 this year, 새해 new year"],["(다)","to do","했다 did, 해요 do"]]},
+  "차":{sino:[["車","vehicle","자동차 car, 기차 train"],["茶","tea","녹차 green tea, 홍차 black tea"]],native:[["(다)","to kick / be cold / be full","공을 차다 kick a ball"]]},
+  "화":{sino:[["火","fire","화재 blaze, 화산 volcano"],["話","speech","대화 conversation, 전화 phone"],["花","flower","화분 flowerpot, 생화 fresh flowers"],["化","transform/-ize","문화 culture, 자동화 automation"]],native:[["","anger","화가 나다 to get angry, 화났어 I'm mad"]]},
+  "시":{sino:[["時","time/hour","시간 time, 시계 clock"],["視","watch/look","시선 gaze, 무시 ignore"],["始","begin/start","시작 start, 개시 launch"]],native:[["(다)","to be sour","맛이 시다 taste sour"]]},
+};
+
+const PIECEMAP = {
+  "운동|운":["運","운 (運)"],
+  "운동|동":["動","동 (動)"],
+  "자동차|동":["動","동 (動)"],
+  "자동차|차":["車","차 (車)"],
+  "동물|동":["動","동 (動)"],
+  "동물|물":["物","물 (物)"],
+  "출발|출":["出","출 (出)"],
+  "출발|발":["發","발 (發)"],
+  "출구|출":["出","출 (出)"],
+  "출구|구":["口","구 (口)"],
+  "수출|출":["出","출 (出)"],
+  "입구|입":["入","입 (入)"],
+  "입구|구":["口","구 (口)"],
+  "수입|입":["入","입 (入)"],
+  "입장|입":["入","입 (入)"],
+  "입장|장":["場","장 (場)"],
+  "행동|행":["行","행 (行)"],
+  "행동|동":["動","동 (動)"],
+  "여행|행":["行","행 (行)"],
+  "비행기|행":["行","행 (行)"],
+  "비행기|기":["機","기 (機)"],
+  "상반기|상":["上","상 (上)"],
+  "이상|상":["想","상 (想)"],
+  "상하|상":["上","상 (上)"],
+  "상하|하":["下","하 (下)"],
+  "지하|지":["地","지 (地)"],
+  "지하|하":["下","하 (下)"],
+  "이하|하":["下","하 (下)"],
+  "낙하|하":["下","하 (下)"],
+  "내부|내":["內","내 (內)"],
+  "내부|부":["部","부 (部)"],
+  "국내|국":["國","국 (國)"],
+  "국내|내":["內","내 (內)"],
+  "실내|실":["室","실 (室)"],
+  "실내|내":["內","내 (內)"],
+  "외부|외":["外","외 (外)"],
+  "외부|부":["部","부 (部)"],
+  "외국|외":["外","외 (外)"],
+  "외국|국":["國","국 (國)"],
+  "실외|실":["室","실 (室)"],
+  "실외|외":["外","외 (外)"],
+  "오전|전":["前","전 (前)"],
+  "전반|전":["前","전 (前)"],
+  "직전|전":["前","전 (前)"],
+  "오후|후":["後","후 (後)"],
+  "후반|후":["後","후 (後)"],
+  "직후|후":["後","후 (後)"],
+  "좌회전|좌":["左","좌 (左)"],
+  "좌회전|회":["回","회 (回)"],
+  "좌측|좌":["左","좌 (左)"],
+  "좌석|좌":["左","좌 (左)"],
+  "우회전|우":["右","우 (右)"],
+  "우회전|회":["回","회 (回)"],
+  "우측|우":["右","우 (右)"],
+  "좌우|좌":["左","좌 (左)"],
+  "좌우|우":["右","우 (右)"],
+  "회전|회":["回","회 (回)"],
+  "회복|회":["回","회 (回)"],
+  "회수|회":["回","회 (回)"],
+  "회수|수":["收","수 (收)"],
+  "반대|반":["反","반 (反)"],
+  "반항|반":["反","반 (反)"],
+  "반비례|반":["反","반 (反)"],
+  "반비례|비":["比","비 (比)"],
+  "교통|교":["交","교 (交)"],
+  "교통|통":["通","통 (通)"],
+  "통화|통":["通","통 (通)"],
+  "통화|화":["話","화 (話)"],
+  "통과|통":["通","통 (通)"],
+  "도착|도":["到","도 (到)"],
+  "도달|도":["到","도 (到)"],
+  "운전|운":["運","운 (運)"],
+  "운송|운":["運","운 (運)"],
+  "운명|운":["運","운 (運)"],
+  "하락|하":["下","하 (下)"],
+  "유행|유":["流","유 (流)"],
+  "유행|행":["行","행 (行)"],
+  "교류|교":["交","교 (交)"],
+  "교류|유":["流","유 (流)"],
+  "전류|유":["流","유 (流)"],
+  "추가|가":["加","가 (加)"],
+  "가속|가":["加","가 (加)"],
+  "가속|속":["速","속 (速)"],
+  "가공|가":["加","가 (加)"],
+  "감소|감":["減","감 (減)"],
+  "감소|소":["少","소 (少)"],
+  "감축|감":["減","감 (減)"],
+  "감면|감":["減","감 (減)"],
+  "교환|교":["交","교 (交)"],
+  "외교|외":["外","외 (外)"],
+  "외교|교":["交","교 (交)"],
+  "방향|방":["方","방 (方)"],
+  "방향|향":["向","향 (向)"],
+  "향상|향":["向","향 (向)"],
+  "향상|상":["上","상 (上)"],
+  "경향|향":["向","향 (向)"],
+  "시간|시":["時","시 (時)"],
+  "시간|간":["間","간 (間)"],
+  "시계|시":["時","시 (時)"],
+  "시계|계":["計","계 (計)"],
+  "동시|동":["同","동 (同)"],
+  "동시|시":["時","시 (時)"],
+  "중간|중":["中","중 (中)"],
+  "중간|간":["間","간 (間)"],
+  "기간|간":["間","간 (間)"],
+  "공간|공":["空","공 (空)"],
+  "공간|간":["間","간 (間)"],
+  "매일|일":["日","일 (日)"],
+  "일요일|일":["日","일 (日)"],
+  "평일|일":["日","일 (日)"],
+  "매월|월":["月","월 (月)"],
+  "월요일|월":["月","월 (月)"],
+  "월요일|일":["日","일 (日)"],
+  "개월|월":["月","월 (月)"],
+  "공기|공":["空","공 (空)"],
+  "공기|기":["氣","기 (氣)"],
+  "기분|기":["氣","기 (氣)"],
+  "전기|기":["氣","기 (氣)"],
+  "천재|천":["天","천 (天)"],
+  "천국|천":["天","천 (天)"],
+  "천국|국":["國","국 (國)"],
+  "천사|천":["天","천 (天)"],
+  "지역|지":["地","지 (地)"],
+  "지도|지":["地","지 (地)"],
+  "지도|도":["圖","도 (圖)"],
+  "수영|수":["水","수 (水)"],
+  "생수|생":["生","생 (生)"],
+  "생수|수":["水","수 (水)"],
+  "음료수|수":["水","수 (水)"],
+  "화재|화":["火","화 (火)"],
+  "화요일|화":["火","화 (火)"],
+  "화요일|일":["日","일 (日)"],
+  "화산|화":["火","화 (火)"],
+  "화산|산":["山","산 (山)"],
+  "태풍|태":["態","태 (態)"],
+  "태풍|풍":["風","풍 (風)"],
+  "풍경|풍":["風","풍 (風)"],
+  "선풍기|풍":["風","풍 (風)"],
+  "선풍기|기":["機","기 (機)"],
+  "등산|산":["山","산 (山)"],
+  "산맥|산":["山","산 (山)"],
+  "현금|금":["金","금 (金)"],
+  "금요일|금":["金","금 (金)"],
+  "금요일|일":["日","일 (日)"],
+  "요금|금":["金","금 (金)"],
+  "목재|목":["木","목 (木)"],
+  "목요일|목":["木","목 (木)"],
+  "목요일|일":["日","일 (日)"],
+  "수목원|목":["木","목 (木)"],
+  "수목원|원":["園","원 (院/園)"],
+  "토지|토":["土","토 (土)"],
+  "토지|지":["地","지 (地)"],
+  "토요일|토":["土","토 (土)"],
+  "토요일|일":["日","일 (日)"],
+  "영토|토":["土","토 (土)"],
+  "관광|광":["光","광 (光)"],
+  "영광|광":["光","광 (光)"],
+  "광선|광":["光","광 (光)"],
+  "광선|선":["線","선 (線)"],
+  "야간|야":["夜","야 (夜)"],
+  "야간|간":["間","간 (間)"],
+  "야식|야":["夜","야 (夜)"],
+  "야식|식":["食","식 (食)"],
+  "야경|야":["夜","야 (夜)"],
+  "조식|조":["朝","조 (朝)"],
+  "조식|식":["食","식 (食)"],
+  "인간|인":["人","인 (人)"],
+  "인간|간":["間","간 (間)"],
+  "외국인|외":["外","외 (外)"],
+  "외국인|국":["國","국 (國)"],
+  "외국인|인":["人","인 (人)"],
+  "인구|인":["人","인 (人)"],
+  "인구|구":["口","구 (口)"],
+  "소비자|비":["費","비 (費)"],
+  "소비자|자":["者","자 (者)"],
+  "과학자|과":["科","과 (科)"],
+  "과학자|학":["學","학 (學)"],
+  "과학자|자":["者","자 (者)"],
+  "기자|자":["者","자 (者)"],
+  "의사|사":["師","사 (師/士)"],
+  "변호사|변":["變","변 (變)"],
+  "변호사|사":["士","사 (師/士)"],
+  "교사|교":["敎","교 (敎)"],
+  "교사|사":["師","사 (師/士)"],
+  "작가|작":["作","작 (作)"],
+  "작가|가":["家","가 (家)"],
+  "가족|가":["家","가 (家)"],
+  "전문가|가":["家","가 (家)"],
+  "직원|직":["職","직 (職)"],
+  "직원|원":["員","원 (員)"],
+  "공무원|공":["公","공 (公)"],
+  "공무원|원":["員","원 (員)"],
+  "회원|원":["員","원 (員)"],
+  "국민|국":["國","국 (國)"],
+  "국민|민":["民","민 (民)"],
+  "시민|민":["民","민 (民)"],
+  "민주주의|민":["民","민 (民)"],
+  "민주주의|주":["主","주 (主)"],
+  "민주주의|의":["意","의 (意)"],
+  "한국|국":["國","국 (國)"],
+  "국가|국":["國","국 (國)"],
+  "국가|가":["家","가 (家)"],
+  "부모|부":["父","부 (父)"],
+  "부모|모":["母","모 (母)"],
+  "부친|부":["父","부 (父)"],
+  "부친|친":["親","친 (親)"],
+  "조부모|부":["父","부 (父)"],
+  "조부모|모":["母","모 (母)"],
+  "모친|모":["母","모 (母)"],
+  "모친|친":["親","친 (親)"],
+  "모국어|모":["母","모 (母)"],
+  "모국어|국":["國","국 (國)"],
+  "모국어|어":["語","어 (語)"],
+  "형제|형":["兄","형 (兄)"],
+  "형제|제":["弟","제 (弟)"],
+  "의형제|형":["兄","형 (兄)"],
+  "의형제|제":["弟","제 (弟)"],
+  "부형|부":["父","부 (父)"],
+  "부형|형":["兄","형 (兄)"],
+  "제자|제":["弟","제 (弟)"],
+  "제자|자":["者","자 (者)"],
+  "남자|남":["男","남 (男)"],
+  "남자|자":["者","자 (者)"],
+  "남성|남":["男","남 (男)"],
+  "남성|성":["性","성 (性)"],
+  "장남|남":["男","남 (男)"],
+  "여자|자":["者","자 (者)"],
+  "여성|성":["性","성 (性)"],
+  "남녀|남":["男","남 (男)"],
+  "친구|친":["親","친 (親)"],
+  "친구|구":["舊","구 (舊)"],
+  "친절|친":["親","친 (親)"],
+  "친척|친":["親","친 (親)"],
+  "동료|동":["同","동 (同)"],
+  "동의|동":["同","동 (同)"],
+  "동의|의":["意","의 (意)"],
+  "교육|교":["敎","교 (敎)"],
+  "종교|교":["敎","교 (敎)"],
+  "군인|군":["軍","군 (軍)"],
+  "군인|인":["人","인 (人)"],
+  "군대|군":["軍","군 (軍)"],
+  "군사|군":["軍","군 (軍)"],
+  "군사|사":["事","사 (事)"],
+  "주인|주":["主","주 (主)"],
+  "주인|인":["人","인 (人)"],
+  "주인공|주":["主","주 (主)"],
+  "주인공|인":["人","인 (人)"],
+  "주인공|공":["公","공 (公)"],
+  "주요|주":["主","주 (主)"],
+  "관심|심":["心","심 (心)"],
+  "안심|안":["安","안 (安)"],
+  "안심|심":["心","심 (心)"],
+  "중심|중":["中","중 (中)"],
+  "중심|심":["心","심 (心)"],
+  "자신|신":["身","신 (身)"],
+  "신체|신":["身","신 (身)"],
+  "신분|신":["身","신 (身)"],
+  "신뢰|신":["信","신 (信)"],
+  "자신감|신":["身","신 (身)"],
+  "자신감|감":["感","감 (感)"],
+  "신호|신":["信","신 (信)"],
+  "감정|감":["感","감 (感)"],
+  "감정|정":["情","정 (情)"],
+  "열정|정":["情","정 (情)"],
+  "동정|동":["同","동 (同)"],
+  "동정|정":["情","정 (情)"],
+  "감사|감":["感","감 (感)"],
+  "감동|감":["感","감 (感)"],
+  "감동|동":["動","동 (動)"],
+  "감각|감":["感","감 (感)"],
+  "발견|발":["發","발 (發)"],
+  "발견|견":["見","견 (見)"],
+  "의견|의":["意","의 (意)"],
+  "의견|견":["見","견 (見)"],
+  "편견|견":["見","견 (見)"],
+  "소문|소":["所","소 (所)"],
+  "소문|문":["聞","문 (聞)"],
+  "신문|신":["新","신 (新)"],
+  "신문|문":["聞","문 (聞)"],
+  "청문회|청":["聽","청 (聽)"],
+  "청문회|문":["聞","문 (聞)"],
+  "시선|시":["視","시 (視)"],
+  "시선|선":["線","선 (線)"],
+  "시청자|시":["視","시 (視)"],
+  "시청자|청":["聽","청 (聽)"],
+  "시청자|자":["者","자 (者)"],
+  "무시|무":["無","무 (無)"],
+  "무시|시":["視","시 (視)"],
+  "청취자|청":["聽","청 (聽)"],
+  "청취자|자":["者","자 (者)"],
+  "청각|청":["聽","청 (聽)"],
+  "대화|화":["話","화 (話)"],
+  "전화|화":["話","화 (話)"],
+  "화제|화":["話","화 (話)"],
+  "한국어|국":["國","국 (國)"],
+  "한국어|어":["語","어 (語)"],
+  "언어|어":["語","어 (語)"],
+  "단어|어":["語","어 (語)"],
+  "문화|문":["文","문 (文)"],
+  "문화|화":["化","화 (化)"],
+  "문장|문":["文","문 (文)"],
+  "문자|문":["文","문 (文)"],
+  "성명|명":["名","명 (名)"],
+  "유명|명":["名","명 (名)"],
+  "명사|명":["名","명 (名)"],
+  "상상|상":["想","상 (想)"],
+  "예상|상":["想","상 (想)"],
+  "의미|의":["意","의 (意)"],
+  "주의|의":["意","의 (意)"],
+  "안전|안":["安","안 (安)"],
+  "안전|전":["全","전 (全)"],
+  "불안|안":["安","안 (安)"],
+  "백화점|점":["店","점 (店)"],
+  "표현|표":["表","표 (表)"],
+  "대표|표":["表","표 (表)"],
+  "발표|발":["發","발 (發)"],
+  "발표|표":["表","표 (表)"],
+  "상담|상":["相","상 (相)"],
+  "상대|상":["相","상 (相)"],
+  "상호|상":["相","상 (相)"],
+  "장소|장":["場","장 (場)"],
+  "장소|소":["所","소 (所)"],
+  "안내소|내":["內","내 (內)"],
+  "안내소|소":["所","소 (所)"],
+  "매표소|소":["所","소 (所)"],
+  "화장실|화":["化","화 (化)"],
+  "화장실|실":["室","실 (室)"],
+  "교실|교":["敎","교 (敎)"],
+  "교실|실":["室","실 (室)"],
+  "사무실|사":["事","사 (事)"],
+  "사무실|실":["室","실 (室)"],
+  "도서관|도":["圖","도 (圖)"],
+  "도서관|서":["書","서 (書)"],
+  "도서관|관":["館","관 (館)"],
+  "박물관|물":["物","물 (物)"],
+  "박물관|관":["館","관 (館)"],
+  "미술관|관":["館","관 (館)"],
+  "병원|원":["院","원 (院/園)"],
+  "공원|공":["公","공 (公)"],
+  "공원|원":["園","원 (院/園)"],
+  "학원|학":["學","학 (學)"],
+  "학원|원":["院","원 (院/園)"],
+  "주차장|차":["車","차 (車)"],
+  "주차장|장":["場","장 (場)"],
+  "시장|장":["場","장 (場)"],
+  "극장|장":["場","장 (場)"],
+  "편의점|점":["店","점 (店)"],
+  "서점|서":["書","서 (書)"],
+  "서점|점":["店","점 (店)"],
+  "비상구|상":["常","상 (常)"],
+  "비상구|구":["口","구 (口)"],
+  "우체국|국":["局","국 (局)"],
+  "방송국|국":["局","국 (局)"],
+  "약국|국":["局","국 (局)"],
+  "물건|물":["物","물 (物)"],
+  "식물|물":["物","물 (物)"],
+  "제품|제":["製","제 (制/製)"],
+  "제품|품":["品","품 (品)"],
+  "화장품|화":["化","화 (化)"],
+  "화장품|품":["品","품 (品)"],
+  "식품|식":["食","식 (食)"],
+  "식품|품":["品","품 (品)"],
+  "세탁기|기":["機","기 (機)"],
+  "자판기|기":["機","기 (機)"],
+  "휴지|지":["紙","지 (紙)"],
+  "편지지|지":["紙","지 (紙)"],
+  "신문지|신":["新","신 (新)"],
+  "신문지|문":["聞","문 (聞)"],
+  "신문지|지":["紙","지 (紙)"],
+  "기차|차":["車","차 (車)"],
+  "열차|차":["車","차 (車)"],
+  "음식|식":["食","식 (食)"],
+  "식사|식":["食","식 (食)"],
+  "식사|사":["事","사 (事)"],
+  "한식|식":["食","식 (食)"],
+  "방면|방":["方","방 (方)"],
+  "방법|방":["方","방 (方)"],
+  "방법|법":["法","법 (法)"],
+  "기본|본":["本","본 (本)"],
+  "본질|본":["本","본 (本)"],
+  "일본|일":["日","일 (日)"],
+  "일본|본":["本","본 (本)"],
+  "서류|서":["書","서 (書)"],
+  "교과서|교":["敎","교 (敎)"],
+  "교과서|과":["科","과 (科)"],
+  "교과서|서":["書","서 (書)"],
+  "2호선|선":["線","선 (線)"],
+  "노선|선":["線","선 (線)"],
+  "직선|선":["線","선 (線)"],
+  "선박|선":["船","선 (船)"],
+  "어선|선":["船","선 (船)"],
+  "우주선|선":["船","선 (船)"],
+  "의도|의":["意","의 (意)"],
+  "의도|도":["圖","도 (圖)"],
+  "무대|대":["臺","대 (臺)"],
+  "침대|대":["臺","대 (臺)"],
+  "전망대|대":["臺","대 (臺)"],
+  "부분|부":["部","부 (部)"],
+  "부서|부":["部","부 (部)"],
+  "전부|전":["全","전 (全)"],
+  "전부|부":["部","부 (部)"],
+  "집중|집":["集","집 (集)"],
+  "집중|중":["中","중 (中)"],
+  "수집|수":["收","수 (收)"],
+  "수집|집":["集","집 (集)"],
+  "모집|모":["母","모 (母)"],
+  "모집|집":["集","집 (集)"],
+  "화분|화":["花","화 (花)"],
+  "화초|화":["花","화 (花)"],
+  "생화|생":["生","생 (生)"],
+  "생화|화":["花","화 (花)"],
+  "학생|학":["學","학 (學)"],
+  "학생|생":["生","생 (生)"],
+  "학교|학":["學","학 (學)"],
+  "학교|교":["校","교 (校)"],
+  "과학|과":["科","과 (科)"],
+  "과학|학":["學","학 (學)"],
+  "교장|교":["校","교 (校)"],
+  "교감|교":["校","교 (校)"],
+  "사고|사":["事","사 (事)"],
+  "사건|사":["事","사 (事)"],
+  "작품|작":["作","작 (作)"],
+  "작품|품":["品","품 (品)"],
+  "작업|작":["作","작 (作)"],
+  "작업|업":["業","업 (業)"],
+  "직업|직":["職","직 (職)"],
+  "직업|업":["業","업 (業)"],
+  "사업|사":["事","사 (事)"],
+  "사업|업":["業","업 (業)"],
+  "졸업|업":["業","업 (業)"],
+  "법률|법":["法","법 (法)"],
+  "문법|문":["文","문 (文)"],
+  "문법|법":["法","법 (法)"],
+  "성공|성":["成","성 (成)"],
+  "완성|성":["成","성 (成)"],
+  "성장|성":["成","성 (成)"],
+  "생일|생":["生","생 (生)"],
+  "생일|일":["日","일 (日)"],
+  "생활|생":["生","생 (生)"],
+  "생물|생":["生","생 (生)"],
+  "생물|물":["物","물 (物)"],
+  "개발|발":["發","발 (發)"],
+  "능력|력":["力","력 (力)"],
+  "노력|력":["力","력 (力)"],
+  "강력|강":["强","강 (强)"],
+  "강력|력":["力","력 (力)"],
+  "정부|정":["政","정 (政)"],
+  "정치|정":["政","정 (政)"],
+  "정책|정":["政","정 (政)"],
+  "공공|공":["公","공 (公)"],
+  "직무|직":["職","직 (職)"],
+  "과목|과":["科","과 (科)"],
+  "내과|내":["內","내 (內)"],
+  "내과|과":["科","과 (科)"],
+  "현실|실":["實","실 (實)"],
+  "실제|실":["實","실 (實)"],
+  "실화|실":["實","실 (實)"],
+  "실화|화":["話","화 (話)"],
+  "제도|제":["制","제 (制/製)"],
+  "제작|제":["製","제 (制/製)"],
+  "제작|작":["作","작 (作)"],
+  "계획|계":["計","계 (計)"],
+  "계산|계":["計","계 (計)"],
+  "결과|결":["結","결 (結)"],
+  "결과|과":["果","과 (果)"],
+  "결정|결":["結","결 (結)"],
+  "결정|정":["定","정 (定)"],
+  "결혼|결":["結","결 (結)"],
+  "효과|과":["果","과 (果)"],
+  "성과|성":["成","성 (成)"],
+  "성과|과":["果","과 (果)"],
+  "조건|조":["條","조 (條)"],
+  "조항|조":["條","조 (條)"],
+  "조례|조":["條","조 (條)"],
+  "해결|해":["解","해 (解)"],
+  "해결|결":["結","결 (結)"],
+  "이해|해":["解","해 (解)"],
+  "해고|해":["解","해 (解)"],
+  "변화|변":["變","변 (變)"],
+  "변화|화":["化","화 (化)"],
+  "변경|변":["變","변 (變)"],
+  "변동|변":["變","변 (變)"],
+  "변동|동":["動","동 (動)"],
+  "자동화|동":["動","동 (動)"],
+  "자동화|화":["化","화 (化)"],
+  "서구화|화":["化","화 (化)"],
+  "합격|합":["合","합 (合)"],
+  "종합|합":["合","합 (合)"],
+  "합의|합":["合","합 (合)"],
+  "합의|의":["意","의 (意)"],
+  "선택|선":["選","선 (選)"],
+  "선수|선":["選","선 (選)"],
+  "선거|선":["選","선 (選)"],
+  "시작|시":["始","시 (始)"],
+  "시작|작":["作","작 (作)"],
+  "시초|시":["始","시 (始)"],
+  "개시|시":["始","시 (始)"],
+  "최종|최":["最","최 (最)"],
+  "최종|종":["終","종 (終)"],
+  "종료|종":["終","종 (終)"],
+  "종점|종":["終","종 (終)"],
+  "연락|연":["連","연 (連)"],
+  "연속|연":["連","연 (連)"],
+  "연휴|연":["連","연 (連)"],
+  "대학교|대":["大","대 (大)"],
+  "대학교|학":["學","학 (學)"],
+  "대학교|교":["校","교 (校)"],
+  "대통령|대":["大","대 (大)"],
+  "대통령|통":["統","통 (統)"],
+  "대다수|대":["大","대 (大)"],
+  "대다수|다":["多","다 (多)"],
+  "최소|최":["最","최 (最)"],
+  "최소|소":["小","소 (小)"],
+  "소형|소":["小","소 (小)"],
+  "축소|소":["小","소 (小)"],
+  "중국|중":["中","중 (中)"],
+  "중국|국":["國","국 (國)"],
+  "최고|최":["最","최 (最)"],
+  "최고|고":["高","고 (高)"],
+  "고등학교|고":["高","고 (高)"],
+  "고등학교|학":["學","학 (學)"],
+  "고등학교|교":["校","교 (校)"],
+  "고급|고":["高","고 (高)"],
+  "최저|최":["最","최 (最)"],
+  "최저|저":["低","저 (低)"],
+  "저렴|저":["低","저 (低)"],
+  "저하|저":["低","저 (低)"],
+  "저하|하":["下","하 (下)"],
+  "다수|다":["多","다 (多)"],
+  "다양|다":["多","다 (多)"],
+  "다용도|다":["多","다 (多)"],
+  "소수|소":["少","소 (少)"],
+  "소년|소":["少","소 (少)"],
+  "신제품|신":["新","신 (新)"],
+  "신제품|제":["製","제 (制/製)"],
+  "신제품|품":["品","품 (品)"],
+  "신세대|신":["新","신 (新)"],
+  "구형|구":["舊","구 (舊)"],
+  "구세대|구":["舊","구 (舊)"],
+  "구시가지|구":["舊","구 (舊)"],
+  "구시가지|지":["地","지 (地)"],
+  "무료|무":["無","무 (無)"],
+  "무인|무":["無","무 (無)"],
+  "무인|인":["人","인 (人)"],
+  "무조건|무":["無","무 (無)"],
+  "무조건|조":["條","조 (條)"],
+  "불친절|친":["親","친 (親)"],
+  "최신|최":["最","최 (最)"],
+  "최신|신":["新","신 (新)"],
+  "최초|최":["最","최 (最)"],
+  "특별|특":["特","특 (特)"],
+  "특징|특":["特","특 (特)"],
+  "특기|특":["特","특 (特)"],
+  "공항|공":["空","공 (空)"],
+  "공석|공":["空","공 (空)"],
+  "예정|정":["定","정 (定)"],
+  "정기|정":["定","정 (定)"],
+  "정상|정":["正","정 (正)"],
+  "정상|상":["常","상 (常)"],
+  "정확|정":["正","정 (正)"],
+  "정직|정":["正","정 (正)"],
+  "중요|중":["重","중 (重)"],
+  "중량|중":["重","중 (重)"],
+  "신중|중":["重","중 (重)"],
+  "경차|경":["輕","경 (輕)"],
+  "경차|차":["車","차 (車)"],
+  "경량|경":["輕","경 (輕)"],
+  "경솔|경":["輕","경 (輕)"],
+  "강화|강":["强","강 (强)"],
+  "강화|화":["化","화 (化)"],
+  "강제|강":["强","강 (强)"],
+  "강제|제":["制","제 (制/製)"],
+  "약점|약":["弱","약 (弱)"],
+  "약화|약":["弱","약 (弱)"],
+  "약화|화":["化","화 (化)"],
+  "취약|약":["弱","약 (弱)"],
+  "가격|가":["價","가 (價)"],
+  "가치|가":["價","가 (價)"],
+  "평가|가":["價","가 (價)"],
+  "세금|금":["金","금 (金)"],
+  "소비|비":["費","비 (費)"],
+  "교통비|교":["交","교 (交)"],
+  "교통비|통":["通","통 (通)"],
+  "교통비|비":["費","비 (費)"],
+  "비용|비":["費","비 (費)"],
+  "재산|재":["財","재 (財)"],
+  "재정|재":["財","재 (財)"],
+  "재정|정":["政","정 (政)"],
+  "재화|재":["財","재 (財)"],
+  "상품|상":["商","상 (商)"],
+  "상품|품":["品","품 (品)"],
+  "상점|상":["商","상 (商)"],
+  "상점|점":["店","점 (店)"],
+  "상업|상":["商","상 (商)"],
+  "상업|업":["業","업 (業)"],
+  "수익|수":["收","수 (收)"],
+  "지출|지":["支","지 (支)"],
+  "지출|출":["出","출 (出)"],
+  "지원|지":["支","지 (支)"],
+  "지급|지":["支","지 (支)"],
+  "가능성|성":["性","성 (性)"],
+  "중요성|중":["重","중 (重)"],
+  "중요성|성":["性","성 (性)"],
+  "증명|증":["證","증 (證)"],
+  "학생증|학":["學","학 (學)"],
+  "학생증|생":["生","생 (生)"],
+  "학생증|증":["證","증 (證)"],
+  "영수증|수":["收","수 (收)"],
+  "영수증|증":["證","증 (證)"],
+  "목적|적":["的","적 (的)"],
+  "문화적|문":["文","문 (文)"],
+  "문화적|화":["化","화 (化)"],
+  "문화적|적":["的","적 (的)"],
+  "개인적|인":["人","인 (人)"],
+  "개인적|적":["的","적 (的)"],
+  "전통|통":["統","통 (統)"],
+  "통계|통":["統","통 (統)"],
+  "통계|계":["計","계 (計)"],
+  "완전|전":["全","전 (全)"],
+  "전국|전":["全","전 (全)"],
+  "전국|국":["國","국 (國)"],
+  "상식|상":["常","상 (常)"],
+  "일상|일":["日","일 (日)"],
+  "일상|상":["常","상 (常)"],
+  "선생|선":["先","선 (先)"],
+  "선생|생":["生","생 (生)"],
+  "우선|선":["先","선 (先)"],
+  "선배|선":["先","선 (先)"],
+  "관계|관":["關","관 (關)"],
+  "관련|관":["關","관 (關)"],
+  "관문|관":["關","관 (關)"],
+  "속도|속":["速","속 (速)"],
+  "고속|고":["高","고 (高)"],
+  "고속|속":["速","속 (速)"],
+  "청년|청":["靑","청 (靑)"],
+  "청소년|청":["靑","청 (靑)"],
+  "청소년|소":["少","소 (少)"],
+  "비교|비":["比","비 (比)"],
+  "비율|비":["比","비 (比)"],
+  "비례|비":["比","비 (比)"],
+  "음악|음":["音","음 (音)"],
+  "발음|발":["發","발 (發)"],
+  "발음|음":["音","음 (音)"],
+  "녹음|음":["音","음 (音)"],
+  "안락|안":["安","안 (安)"],
+  "상태|태":["態","태 (態)"],
+  "태도|태":["態","태 (態)"],
+  "형태|태":["態","태 (態)"],
+  "예방|방":["防","방 (防)"],
+  "방어|방":["防","방 (防)"],
+  "소방서|방":["防","방 (防)"],
+};
+
+const SENT = {
+  "운동":["저는 매일 아침 운동을 해요.","I exercise every morning."],
+  "자동차":["새 자동차를 사고 싶어요.","I want to buy a new car."],
+  "동물":["어떤 동물을 제일 좋아해요?","Which animal do you like most?"],
+  "출발":["기차가 곧 출발해요.","The train departs soon."],
+  "출구":["출구가 어디에 있어요?","Where is the exit?"],
+  "수출":["이 회사는 자동차를 수출해요.","This company exports cars."],
+  "입구":["입구에서 만나요.","Let's meet at the entrance."],
+  "수입":["수입이 작년보다 늘었어요.","Income has grown since last year."],
+  "입장":["입장 시간은 일곱 시예요.","Admission time is seven o'clock."],
+  "행동":["그의 행동이 이상했어요.","His behavior was strange."],
+  "여행":["다음 달에 여행을 갈 거예요.","I'm going to travel next month."],
+  "비행기":["비행기가 하늘을 날아요.","The airplane flies in the sky."],
+  "상반기":["상반기 매출이 좋았어요.","First-half sales were good."],
+  "이상":["그건 제 이상형이에요.","That's my ideal type."],
+  "상하":["이 상자는 상하를 구분해요.","This box distinguishes top and bottom."],
+  "지하":["지하로 내려가세요.","Please go down to the basement."],
+  "이하":["열 살 이하는 무료예요.","Under ten years old is free."],
+  "낙하":["낙하 속도가 빨라요.","The falling speed is fast."],
+  "내부":["건물 내부가 깨끗해요.","The inside of the building is clean."],
+  "국내":["국내 여행을 좋아해요.","I like domestic travel."],
+  "실내":["실내에서는 조용히 하세요.","Please be quiet indoors."],
+  "외부":["외부 사람은 들어올 수 없어요.","Outsiders cannot enter."],
+  "외국":["외국에서 살아 봤어요.","I have lived abroad."],
+  "실외":["실외 수영장이 있어요.","There is an outdoor pool."],
+  "오전":["오전에 회의가 있어요.","There is a meeting in the morning."],
+  "전반":["경기 전반이 지루했어요.","The first half of the game was boring."],
+  "직전":["출발 직전에 도착했어요.","I arrived just before departure."],
+  "오후":["오후에 비가 올 거예요.","It will rain in the afternoon."],
+  "후반":["후반에 골을 넣었어요.","They scored in the second half."],
+  "직후":["식사 직후에 산책했어요.","I took a walk right after the meal."],
+  "좌회전":["여기서 좌회전하세요.","Turn left here."],
+  "좌측":["좌측에 화장실이 있어요.","The restroom is on the left."],
+  "좌석":["좌석을 예약했어요.","I reserved a seat."],
+  "우회전":["다음 골목에서 우회전해요.","Turn right at the next alley."],
+  "우측":["우측으로 걸어가세요.","Please walk to the right."],
+  "좌우":["좌우를 잘 보고 건너세요.","Look both ways and cross carefully."],
+  "회전":["바퀴가 빠르게 회전해요.","The wheel rotates quickly."],
+  "회복":["건강이 빨리 회복됐어요.","My health recovered quickly."],
+  "회수":["빌려준 돈을 회수했어요.","I collected the money I lent."],
+  "반대":["저는 그 의견에 반대해요.","I oppose that opinion."],
+  "반항":["아이가 부모에게 반항해요.","The child rebels against the parents."],
+  "반비례":["속도와 시간은 반비례해요.","Speed and time are inversely proportional."],
+  "교통":["교통이 너무 복잡해요.","The traffic is very heavy."],
+  "통화":["어머니와 통화했어요.","I talked with my mother on the phone."],
+  "통과":["시험을 무사히 통과했어요.","I passed the exam safely."],
+  "도착":["기차가 역에 도착했어요.","The train arrived at the station."],
+  "도달":["목표에 도달했어요.","I reached the goal."],
+  "주도":["그가 회의를 주도했어요.","He led the meeting."],
+  "운전":["저는 운전을 잘 못해요.","I'm not good at driving."],
+  "운송":["화물을 트럭으로 운송해요.","They transport cargo by truck."],
+  "운명":["우리는 운명을 믿어요.","We believe in fate."],
+  "추락":["비행기가 추락했어요.","The airplane crashed."],
+  "하락":["주가가 크게 하락했어요.","Stock prices dropped sharply."],
+  "유행":["요즘 이 노래가 유행이에요.","This song is popular these days."],
+  "교류":["두 나라가 문화를 교류해요.","The two countries exchange culture."],
+  "전류":["전선에 전류가 흘러요.","Current flows through the wire."],
+  "추가":["주문을 추가하고 싶어요.","I'd like to add to my order."],
+  "가속":["차가 갑자기 가속했어요.","The car suddenly accelerated."],
+  "가공":["이 공장은 생선을 가공해요.","This factory processes fish."],
+  "감소":["인구가 점점 감소해요.","The population is gradually decreasing."],
+  "감축":["회사가 비용을 감축했어요.","The company reduced costs."],
+  "감면":["세금을 감면받았어요.","I received a tax reduction."],
+  "교환":["선물을 교환했어요.","We exchanged gifts."],
+  "외교":["두 나라의 외교가 좋아요.","Relations between the two countries are good."],
+  "방향":["방향을 잘못 잡았어요.","I took the wrong direction."],
+  "향상":["실력이 많이 향상됐어요.","My skills improved a lot."],
+  "경향":["그는 늦는 경향이 있어요.","He tends to be late."],
+  "선생":["선생님께 질문했어요.","I asked the teacher a question."],
+  "우선":["우선 손을 씻으세요.","First of all, wash your hands."],
+  "선배":["선배가 밥을 사 줬어요.","My senior bought me a meal."],
+  "관계":["두 사람은 관계가 좋아요.","The two have a good relationship."],
+  "관련":["이 일과 관련이 없어요.","This has no connection to the matter."],
+  "관문":["첫 관문을 통과했어요.","I passed the first hurdle."],
+  "시간":["시간이 정말 빨리 가요.","Time really flies."],
+  "시계":["시계가 멈췄어요.","The clock stopped."],
+  "동시":["두 사람이 동시에 도착했어요.","The two arrived at the same time."],
+  "중간":["영화 중간에 잠들었어요.","I fell asleep in the middle of the movie."],
+  "기간":["할인 기간이 끝났어요.","The discount period ended."],
+  "공간":["이 방은 공간이 넓어요.","This room has a lot of space."],
+  "매일":["매일 한국어를 공부해요.","I study Korean every day."],
+  "일요일":["일요일에는 보통 쉬어요.","I usually rest on Sundays."],
+  "평일":["평일에는 회사에 가요.","I go to work on weekdays."],
+  "매월":["매월 월세를 내요.","I pay rent every month."],
+  "월요일":["월요일은 항상 바빠요.","Mondays are always busy."],
+  "개월":["한국에 육 개월 살았어요.","I lived in Korea for six months."],
+  "연말":["연말에 가족을 만나요.","I see my family at year-end."],
+  "내년":["내년에 졸업해요.","I graduate next year."],
+  "매년":["매년 여름에 바다에 가요.","Every summer I go to the sea."],
+  "공기":["산속 공기가 맑아요.","The mountain air is fresh."],
+  "기분":["오늘 기분이 정말 좋아요.","I feel really good today."],
+  "전기":["전기가 갑자기 나갔어요.","The electricity suddenly went out."],
+  "천재":["그 아이는 음악 천재예요.","That child is a music genius."],
+  "천국":["이곳은 정말 천국 같아요.","This place is just like heaven."],
+  "천사":["그녀는 천사처럼 친절해요.","She is kind like an angel."],
+  "지역":["이 지역은 조용해요.","This area is quiet."],
+  "지도":["지도를 보고 길을 찾았어요.","I found the way using a map."],
+  "수영":["여름마다 수영을 배워요.","I learn swimming every summer."],
+  "생수":["생수 한 병 주세요.","Please give me a bottle of water."],
+  "음료수":["음료수는 냉장고에 있어요.","The drinks are in the fridge."],
+  "화재":["어젯밤에 화재가 났어요.","A fire broke out last night."],
+  "화요일":["화요일에 시험이 있어요.","There is a test on Tuesday."],
+  "화산":["그 화산은 아직 활동해요.","That volcano is still active."],
+  "태풍":["태풍이 마을을 덮쳤어요.","A typhoon hit the village."],
+  "풍경":["창밖 풍경이 아름다워요.","The scenery outside the window is beautiful."],
+  "선풍기":["더워서 선풍기를 켰어요.","It was hot, so I turned on the fan."],
+  "등산":["주말에 등산을 갔어요.","I went hiking on the weekend."],
+  "산맥":["저 산맥은 아주 길어요.","That mountain range is very long."],
+  "현금":["현금으로 계산할게요.","I'll pay with cash."],
+  "금요일":["금요일 저녁이 제일 좋아요.","Friday evening is the best."],
+  "요금":["택시 요금이 올랐어요.","The taxi fare went up."],
+  "목재":["이 가구는 목재로 만들었어요.","This furniture is made of wood."],
+  "목요일":["목요일에 만날까요?","Shall we meet on Thursday?"],
+  "수목원":["수목원에서 산책했어요.","I strolled in the arboretum."],
+  "토지":["그는 넓은 토지를 가지고 있어요.","He owns a large piece of land."],
+  "토요일":["토요일에 친구를 만나요.","I meet friends on Saturday."],
+  "영토":["그 섬은 우리 영토예요.","That island is our territory."],
+  "관광":["서울에서 관광을 즐겼어요.","I enjoyed sightseeing in Seoul."],
+  "영광":["만나서 영광이에요.","It's an honor to meet you."],
+  "광선":["강한 광선이 눈부셔요.","The strong beam is dazzling."],
+  "야간":["야간에 일하는 게 힘들어요.","Working at night is hard."],
+  "야식":["밤에 야식을 자주 먹어요.","I often eat late-night snacks."],
+  "야경":["도시 야경이 멋있어요.","The city night view is wonderful."],
+  "조식":["호텔 조식이 맛있었어요.","The hotel breakfast was delicious."],
+  "조조":["조조 영화를 봤어요.","I watched an early-morning movie."],
+  "조기":["병을 조기에 발견했어요.","The illness was found early."],
+  "인간":["인간은 누구나 실수해요.","Everyone makes mistakes."],
+  "외국인":["외국인 친구가 많아요.","I have many foreign friends."],
+  "인구":["이 도시는 인구가 많아요.","This city has a large population."],
+  "소비자":["소비자들이 가격에 민감해요.","Consumers are sensitive to price."],
+  "과학자":["그녀는 유명한 과학자예요.","She is a famous scientist."],
+  "기자":["기자가 질문을 했어요.","The reporter asked a question."],
+  "의사":["의사가 약을 처방했어요.","The doctor prescribed medicine."],
+  "변호사":["변호사와 상담했어요.","I consulted with a lawyer."],
+  "교사":["그는 고등학교 교사예요.","He is a high school teacher."],
+  "작가":["그 작가의 소설을 좋아해요.","I like that author's novels."],
+  "가족":["주말에 가족과 시간을 보내요.","I spend time with family on weekends."],
+  "전문가":["전문가의 의견을 들었어요.","I heard an expert's opinion."],
+  "직원":["직원이 친절하게 도와줬어요.","The staff helped me kindly."],
+  "공무원":["그는 공무원으로 일해요.","He works as a civil servant."],
+  "회원":["이 클럽 회원이 됐어요.","I became a member of this club."],
+  "국민":["국민이 투표로 결정해요.","The citizens decide by vote."],
+  "시민":["시민들이 공원에 모였어요.","Citizens gathered in the park."],
+  "민주주의":["민주주의는 자유를 존중해요.","Democracy respects freedom."],
+  "한국":["한국은 사계절이 뚜렷해요.","Korea has four distinct seasons."],
+  "국가":["국가가 국민을 보호해요.","The state protects its people."],
+  "부모":["부모님께 전화를 자주 해요.","I call my parents often."],
+  "부친":["그의 부친은 의사세요.","His father is a doctor."],
+  "조부모":["조부모님과 함께 살아요.","I live with my grandparents."],
+  "모친":["모친의 건강이 걱정돼요.","I worry about my mother's health."],
+  "모국어":["제 모국어는 영어예요.","My native language is English."],
+  "형제":["저는 형제가 셋이에요.","I have three siblings."],
+  "의형제":["두 사람은 의형제를 맺었어요.","The two became sworn brothers."],
+  "부형":["부형들이 학교에 모였어요.","The guardians gathered at the school."],
+  "제자":["그는 훌륭한 제자예요.","He is an excellent student."],
+  "남자":["저 남자는 키가 커요.","That man is tall."],
+  "남성":["이 옷은 남성용이에요.","These clothes are for men."],
+  "장남":["그는 집안의 장남이에요.","He is the eldest son of the family."],
+  "여자":["여자 화장실은 이쪽이에요.","The women's restroom is this way."],
+  "여성":["여성 의류 매장이 이층에 있어요.","The women's clothing store is on the second floor."],
+  "남녀":["남녀 모두 환영해요.","Both men and women are welcome."],
+  "친구":["친구와 영화를 봤어요.","I watched a movie with a friend."],
+  "친절":["점원이 아주 친절했어요.","The clerk was very kind."],
+  "친척":["명절에 친척들을 만나요.","I meet relatives on holidays."],
+  "동료":["동료와 점심을 먹었어요.","I had lunch with a colleague."],
+  "동의":["그 계획에 동의해요.","I agree with that plan."],
+  "교육":["교육이 미래를 바꿔요.","Education changes the future."],
+  "종교":["그는 종교가 없어요.","He has no religion."],
+  "군인":["형은 군인이에요.","My brother is a soldier."],
+  "군대":["그는 군대에 갔어요.","He went to the military."],
+  "군사":["군사 훈련이 시작됐어요.","Military training has begun."],
+  "주인":["이 가게 주인은 친절해요.","The owner of this shop is kind."],
+  "주인공":["영화 주인공이 멋있어요.","The movie's main character is cool."],
+  "주요":["주요 뉴스를 확인했어요.","I checked the main news."],
+  "속도":["속도를 좀 줄이세요.","Please slow down a bit."],
+  "고속":["고속 열차를 탔어요.","I took the high-speed train."],
+  "청년":["그 청년은 성실해요.","That young man is diligent."],
+  "청소년":["청소년은 입장이 무료예요.","Admission is free for teenagers."],
+  "청정":["청정 지역의 물은 깨끗해요.","Water in clean regions is pure."],
+  "관심":["저는 음악에 관심이 많아요.","I have a lot of interest in music."],
+  "안심":["그 말을 듣고 안심했어요.","I felt relieved hearing that."],
+  "중심":["도시 중심에 공원이 있어요.","There is a park in the city center."],
+  "자신":["자신을 믿으세요.","Believe in yourself."],
+  "신체":["운동은 신체에 좋아요.","Exercise is good for the body."],
+  "신분":["신분을 증명해 주세요.","Please prove your identity."],
+  "신뢰":["저는 그를 신뢰해요.","I trust him."],
+  "자신감":["그녀는 자신감이 넘쳐요.","She is full of confidence."],
+  "신호":["신호가 빨간색이에요.","The signal is red."],
+  "감정":["감정을 솔직하게 말했어요.","I expressed my feelings honestly."],
+  "열정":["그는 일에 열정이 있어요.","He has passion for his work."],
+  "동정":["그들에게 동정을 느꼈어요.","I felt sympathy for them."],
+  "감사":["도와주셔서 감사해요.","Thank you for helping."],
+  "감동":["그 영화에 깊이 감동했어요.","I was deeply moved by that movie."],
+  "감각":["그는 패션 감각이 좋아요.","He has a good sense of fashion."],
+  "발견":["새로운 사실을 발견했어요.","I discovered a new fact."],
+  "의견":["당신 의견을 말해 주세요.","Please tell me your opinion."],
+  "편견":["편견 없이 판단하세요.","Judge without prejudice."],
+  "소문":["이상한 소문을 들었어요.","I heard a strange rumor."],
+  "신문":["아침마다 신문을 읽어요.","I read the newspaper every morning."],
+  "청문회":["청문회가 오늘 열려요.","The hearing is held today."],
+  "시선":["모두의 시선이 그에게 쏠렸어요.","Everyone's gaze turned to him."],
+  "시청자":["시청자들이 방송을 좋아해요.","Viewers like the broadcast."],
+  "무시":["그는 내 말을 무시했어요.","He ignored what I said."],
+  "청취자":["라디오 청취자가 많아요.","The radio has many listeners."],
+  "청각":["청각이 아주 예민해요.","My hearing is very sensitive."],
+  "대화":["우리는 오래 대화했어요.","We talked for a long time."],
+  "전화":["나중에 전화할게요.","I'll call you later."],
+  "화제":["그 영화가 화제예요.","That movie is the talk of the town."],
+  "한국어":["한국어를 배우고 있어요.","I am learning Korean."],
+  "언어":["그는 세 가지 언어를 해요.","He speaks three languages."],
+  "단어":["새 단어를 외웠어요.","I memorized new words."],
+  "문화":["한국 문화에 관심이 있어요.","I'm interested in Korean culture."],
+  "문장":["이 문장은 너무 길어요.","This sentence is too long."],
+  "문자":["문자 메시지를 보냈어요.","I sent a text message."],
+  "성명":["여기에 성명을 적으세요.","Please write your full name here."],
+  "유명":["이 식당은 아주 유명해요.","This restaurant is very famous."],
+  "명사":["'사랑'은 명사예요.","'Love' is a noun."],
+  "상상":["그건 상상도 못 했어요.","I couldn't even imagine that."],
+  "예상":["결과가 예상과 달랐어요.","The result differed from my expectation."],
+  "의미":["이 단어의 의미가 뭐예요?","What is the meaning of this word?"],
+  "주의":["계단을 조심하도록 주의하세요.","Pay attention and be careful on the stairs."],
+  "안전":["안전을 위해 안전벨트를 매세요.","Wear a seatbelt for safety."],
+  "불안":["시험 때문에 불안해요.","I'm anxious because of the exam."],
+  "백화점":["백화점에서 옷을 샀어요.","I bought clothes at the department store."],
+  "고백":["그는 사랑을 고백했어요.","He confessed his love."],
+  "명백":["그건 명백한 실수예요.","That is an obvious mistake."],
+  "표현":["감정을 표현하기 어려워요.","It's hard to express emotions."],
+  "대표":["그가 회사 대표예요.","He is the company representative."],
+  "발표":["내일 결과를 발표해요.","The results are announced tomorrow."],
+  "상담":["선생님과 상담했어요.","I had a consultation with the teacher."],
+  "상대":["토론 상대가 강했어요.","The debate opponent was strong."],
+  "상호":["두 회사가 상호 협력해요.","The two companies cooperate mutually."],
+  "장소":["약속 장소를 정했어요.","We decided on a meeting place."],
+  "안내소":["안내소에서 길을 물었어요.","I asked for directions at the information desk."],
+  "매표소":["매표소에서 표를 샀어요.","I bought a ticket at the ticket office."],
+  "화장실":["화장실이 어디예요?","Where is the restroom?"],
+  "교실":["교실이 아주 조용해요.","The classroom is very quiet."],
+  "사무실":["사무실에서 일해요.","I work in the office."],
+  "도서관":["도서관에서 공부해요.","I study at the library."],
+  "박물관":["박물관에서 그림을 봤어요.","I saw paintings at the museum."],
+  "미술관":["미술관이 무료예요.","The art gallery is free."],
+  "병원":["아파서 병원에 갔어요.","I went to the hospital because I was sick."],
+  "공원":["공원에서 산책해요.","I take walks in the park."],
+  "학원":["저녁에 영어 학원에 가요.","I go to an English academy in the evening."],
+  "주차장":["주차장이 가득 찼어요.","The parking lot is full."],
+  "시장":["시장에서 과일을 샀어요.","I bought fruit at the market."],
+  "극장":["극장에서 연극을 봤어요.","I saw a play at the theater."],
+  "편의점":["편의점에서 우유를 샀어요.","I bought milk at the convenience store."],
+  "서점":["서점에서 책을 골랐어요.","I picked a book at the bookstore."],
+  "비상구":["비상구는 저쪽이에요.","The emergency exit is over there."],
+  "우체국":["우체국에서 소포를 보냈어요.","I sent a parcel at the post office."],
+  "방송국":["그는 방송국에서 일해요.","He works at a broadcasting station."],
+  "약국":["약국에서 약을 샀어요.","I bought medicine at the pharmacy."],
+  "물건":["이 물건은 비싸요.","This item is expensive."],
+  "식물":["창가에 식물을 키워요.","I grow plants by the window."],
+  "제품":["이 제품은 품질이 좋아요.","This product has good quality."],
+  "화장품":["화장품을 새로 샀어요.","I bought new cosmetics."],
+  "식품":["냉동식품을 자주 사요.","I often buy frozen food."],
+  "세탁기":["세탁기가 고장 났어요.","The washing machine broke down."],
+  "자판기":["자판기에서 커피를 뽑았어요.","I got coffee from the vending machine."],
+  "휴지":["휴지가 다 떨어졌어요.","We're out of tissue."],
+  "편지지":["예쁜 편지지를 샀어요.","I bought pretty letter paper."],
+  "신문지":["신문지로 창문을 닦았어요.","I cleaned the window with newspaper."],
+  "기차":["기차로 부산에 갔어요.","I went to Busan by train."],
+  "열차":["열차가 곧 들어와요.","The train is arriving soon."],
+  "음식":["이 음식은 정말 맛있어요.","This food is really delicious."],
+  "식사":["식사 맛있게 하세요.","Enjoy your meal."],
+  "한식":["저는 한식을 제일 좋아해요.","I like Korean food the most."],
+  "방면":["부산 방면 열차를 탔어요.","I took the train bound for Busan."],
+  "방법":["좋은 방법이 있어요.","I have a good method."],
+  "기본":["기본부터 다시 배워요.","I'm learning from the basics again."],
+  "본질":["문제의 본질을 봐야 해요.","We must see the essence of the problem."],
+  "일본":["작년에 일본에 갔어요.","I went to Japan last year."],
+  "서류":["서류를 제출했어요.","I submitted the documents."],
+  "교과서":["교과서를 펴세요.","Please open your textbook."],
+  "노선":["버스 노선이 바뀌었어요.","The bus route changed."],
+  "직선":["직선으로 그으세요.","Draw a straight line."],
+  "선박":["선박이 항구에 들어왔어요.","The ship entered the harbor."],
+  "어선":["어선이 바다로 나갔어요.","The fishing boat went out to sea."],
+  "우주선":["우주선이 달에 도착했어요.","The spaceship reached the moon."],
+  "의도":["그의 의도를 모르겠어요.","I don't understand his intention."],
+  "무대":["가수가 무대에 올랐어요.","The singer went up on stage."],
+  "침대":["침대에서 책을 읽어요.","I read books in bed."],
+  "전망대":["전망대에서 도시를 봤어요.","I saw the city from the observation deck."],
+  "부분":["이 부분이 제일 어려워요.","This part is the hardest."],
+  "부서":["다른 부서로 옮겼어요.","I moved to a different department."],
+  "전부":["이게 전부예요.","This is everything."],
+  "집중":["공부에 집중하기 어려워요.","It's hard to focus on studying."],
+  "수집":["그는 우표를 수집해요.","He collects stamps."],
+  "모집":["회사가 신입을 모집해요.","The company is recruiting newcomers."],
+  "화분":["창가에 화분을 놓았어요.","I placed a flowerpot by the window."],
+  "화초":["화초에 물을 줬어요.","I watered the plants."],
+  "생화":["생화로 방을 꾸몄어요.","I decorated the room with fresh flowers."],
+  "비교":["두 제품을 비교했어요.","I compared the two products."],
+  "비율":["성공 비율이 높아요.","The success rate is high."],
+  "비례":["노력과 결과는 비례해요.","Effort and results are proportional."],
+  "음악":["저는 음악을 들으면서 일해요.","I work while listening to music."],
+  "발음":["발음이 아주 정확해요.","Your pronunciation is very accurate."],
+  "녹음":["회의를 녹음했어요.","I recorded the meeting."],
+  "오락":["오락 시설이 많아요.","There are many entertainment facilities."],
+  "안락":["의자가 아주 안락해요.","The chair is very comfortable."],
+  "상태":["환자 상태가 좋아졌어요.","The patient's condition improved."],
+  "태도":["그의 태도가 마음에 들어요.","I like his attitude."],
+  "형태":["구름 형태가 특이해요.","The shape of the cloud is unusual."],
+  "학생":["저는 대학교 학생이에요.","I am a university student."],
+  "학교":["학교까지 걸어서 가요.","I walk to school."],
+  "과학":["과학 시간이 제일 재미있어요.","Science class is the most fun."],
+  "교장":["교장 선생님이 말씀하셨어요.","The principal spoke."],
+  "교감":["교감 선생님이 친절해요.","The vice principal is kind."],
+  "회사":["저는 작은 회사에 다녀요.","I work at a small company."],
+  "사고":["길에서 사고가 났어요.","An accident happened on the road."],
+  "사건":["그 사건은 아직 미해결이에요.","That case is still unsolved."],
+  "작품":["이 작품이 정말 멋져요.","This work of art is really wonderful."],
+  "작업":["작업이 거의 끝났어요.","The work is almost done."],
+  "직업":["당신의 직업은 뭐예요?","What is your job?"],
+  "사업":["그는 사업을 시작했어요.","He started a business."],
+  "졸업":["작년에 대학을 졸업했어요.","I graduated from university last year."],
+  "법률":["법률은 모두에게 평등해요.","The law is equal for everyone."],
+  "문법":["한국어 문법이 어려워요.","Korean grammar is difficult."],
+  "성공":["그는 마침내 성공했어요.","He finally succeeded."],
+  "완성":["그림을 드디어 완성했어요.","I finally completed the painting."],
+  "성장":["아이가 빨리 성장해요.","The child grows quickly."],
+  "생일":["오늘은 제 생일이에요.","Today is my birthday."],
+  "생활":["학교 생활이 즐거워요.","School life is enjoyable."],
+  "생물":["바다에는 많은 생물이 살아요.","Many creatures live in the sea."],
+  "개발":["새 앱을 개발하고 있어요.","I'm developing a new app."],
+  "능력":["그는 능력이 뛰어나요.","He has outstanding ability."],
+  "노력":["노력이 결국 통했어요.","The effort finally paid off."],
+  "강력":["강력한 태풍이 왔어요.","A powerful typhoon came."],
+  "정부":["정부가 새 정책을 발표했어요.","The government announced a new policy."],
+  "정치":["그는 정치에 관심이 없어요.","He has no interest in politics."],
+  "정책":["이 정책은 효과가 있어요.","This policy is effective."],
+  "공공":["공공 장소에서는 조용히 하세요.","Be quiet in public places."],
+  "직무":["새 직무를 맡았어요.","I took on a new job duty."],
+  "과목":["좋아하는 과목이 뭐예요?","What's your favorite subject?"],
+  "내과":["내과에서 진료를 받았어요.","I was seen at internal medicine."],
+  "현실":["현실은 생각보다 어려워요.","Reality is harder than I thought."],
+  "실제":["실제로 만나니 반가워요.","It's nice to actually meet in person."],
+  "실화":["이 영화는 실화예요.","This movie is a true story."],
+  "제도":["새 제도가 도입됐어요.","A new system was introduced."],
+  "제작":["영화 제작에 참여했어요.","I took part in producing the film."],
+  "계획":["주말 계획이 있어요?","Do you have weekend plans?"],
+  "계산":["계산이 틀렸어요.","The calculation is wrong."],
+  "결과":["시험 결과가 나왔어요.","The test results came out."],
+  "결정":["아직 결정을 못 했어요.","I haven't decided yet."],
+  "결혼":["그들은 봄에 결혼해요.","They are getting married in spring."],
+  "효과":["약이 금방 효과가 있었어요.","The medicine worked quickly."],
+  "성과":["올해 성과가 좋아요.","This year's results are good."],
+  "조건":["조건이 괜찮으면 살게요.","If the conditions are good, I'll buy it."],
+  "조항":["계약 조항을 읽어 보세요.","Please read the contract clauses."],
+  "조례":["새 조례가 통과됐어요.","A new ordinance was passed."],
+  "해결":["문제를 빨리 해결했어요.","I solved the problem quickly."],
+  "이해":["설명을 이해했어요.","I understood the explanation."],
+  "해고":["그는 갑자기 해고됐어요.","He was suddenly fired."],
+  "변화":["날씨 변화가 심해요.","The weather changes a lot."],
+  "변경":["일정을 변경했어요.","I changed the schedule."],
+  "변동":["가격 변동이 커요.","Price fluctuation is large."],
+  "자동화":["공장이 자동화됐어요.","The factory was automated."],
+  "서구화":["생활이 점점 서구화돼요.","Life is gradually becoming westernized."],
+  "합격":["드디어 시험에 합격했어요.","I finally passed the exam."],
+  "종합":["종합 점수가 높아요.","The overall score is high."],
+  "합의":["양측이 합의했어요.","Both sides reached an agreement."],
+  "선택":["어려운 선택이었어요.","It was a difficult choice."],
+  "선수":["그는 축구 선수예요.","He is a soccer player."],
+  "선거":["내일 선거가 있어요.","There is an election tomorrow."],
+  "시작":["이제 시작해 볼까요?","Shall we start now?"],
+  "시초":["그게 모든 일의 시초였어요.","That was the beginning of everything."],
+  "개시":["새 가게가 영업을 개시했어요.","The new shop opened for business."],
+  "최종":["최종 결정을 내렸어요.","I made the final decision."],
+  "종료":["경기가 종료됐어요.","The game has ended."],
+  "종점":["이 버스의 종점이 어디예요?","Where is this bus's last stop?"],
+  "연락":["도착하면 연락하세요.","Contact me when you arrive."],
+  "연속":["사흘 연속 비가 와요.","It has rained three days in a row."],
+  "연휴":["연휴에 여행을 가요.","I'm traveling during the long weekend."],
+  "대학교":["그 대학교는 아주 유명해요.","That university is very famous."],
+  "대통령":["대통령이 연설을 했어요.","The president gave a speech."],
+  "대다수":["대다수가 찬성했어요.","The majority agreed."],
+  "최소":["최소 인원이 필요해요.","A minimum number of people is needed."],
+  "소형":["소형 차가 주차하기 편해요.","A compact car is easy to park."],
+  "축소":["예산을 축소했어요.","They cut the budget."],
+  "중국":["중국은 인구가 많아요.","China has a large population."],
+  "최고":["오늘 경기는 최고였어요.","Today's game was the best."],
+  "고급":["고급 호텔에서 묵었어요.","I stayed at a luxury hotel."],
+  "최저":["최저 기온이 영하예요.","The lowest temperature is below zero."],
+  "저렴":["이 가게는 가격이 저렴해요.","This shop has cheap prices."],
+  "저하":["체력이 저하됐어요.","My stamina has declined."],
+  "다수":["다수가 그 의견을 지지해요.","The majority supports that opinion."],
+  "다양":["메뉴가 아주 다양해요.","The menu is very diverse."],
+  "다용도":["이건 다용도 가방이에요.","This is a multipurpose bag."],
+  "소수":["소수만 살아남았어요.","Only a few survived."],
+  "소년":["그 소년은 용감해요.","That boy is brave."],
+  "신제품":["신제품이 잘 팔려요.","The new product sells well."],
+  "신세대":["신세대는 생각이 달라요.","The new generation thinks differently."],
+  "구형":["구형 휴대폰을 아직 써요.","I still use an old-model phone."],
+  "구세대":["구세대와 신세대가 달라요.","The old and new generations differ."],
+  "구시가지":["구시가지를 걸어 다녔어요.","I walked around the old town."],
+  "무료":["입장이 무료예요.","Admission is free."],
+  "무인":["무인 가게가 늘고 있어요.","Unmanned stores are increasing."],
+  "무조건":["무조건 찬성하지 마세요.","Don't agree unconditionally."],
+  "불가능":["그건 불가능한 일이에요.","That is an impossible task."],
+  "부당":["그 결정은 부당해요.","That decision is unfair."],
+  "불친절":["직원이 불친절했어요.","The staff was unkind."],
+  "최신":["최신 모델을 샀어요.","I bought the latest model."],
+  "최초":["그게 세계 최초예요.","That is the world's first."],
+  "특별":["오늘은 특별한 날이에요.","Today is a special day."],
+  "특징":["이 차의 특징이 뭐예요?","What are the features of this car?"],
+  "특기":["제 특기는 요리예요.","My specialty is cooking."],
+  "공항":["공항까지 한 시간 걸려요.","It takes an hour to the airport."],
+  "공석":["앞자리에 공석이 있어요.","There's an empty seat up front."],
+  "정기":["정기 검진을 받았어요.","I had a regular checkup."],
+  "예정":["회의는 세 시로 예정됐어요.","The meeting is scheduled for three."],
+  "정상":["기계가 정상으로 작동해요.","The machine works normally."],
+  "정확":["시간이 아주 정확해요.","The timing is very accurate."],
+  "정직":["그는 정직한 사람이에요.","He is an honest person."],
+  "중요":["이건 아주 중요한 일이에요.","This is a very important matter."],
+  "중량":["짐의 중량을 쟀어요.","I measured the weight of the luggage."],
+  "신중":["신중하게 결정하세요.","Decide carefully."],
+  "경차":["경차가 기름을 덜 써요.","A compact car uses less fuel."],
+  "경량":["이 노트북은 경량이에요.","This laptop is lightweight."],
+  "경솔":["경솔하게 행동하지 마세요.","Don't act carelessly."],
+  "강화":["보안을 강화했어요.","They strengthened security."],
+  "강제":["강제로 시키지 마세요.","Don't force anyone."],
+  "약점":["누구나 약점이 있어요.","Everyone has a weakness."],
+  "약화":["힘이 점점 약화됐어요.","The strength gradually weakened."],
+  "취약":["이 부분이 취약해요.","This part is vulnerable."],
+  "가격":["가격이 좀 비싸요.","The price is a bit expensive."],
+  "가치":["이 책은 읽을 가치가 있어요.","This book is worth reading."],
+  "평가":["성적을 공정하게 평가해요.","Grades are evaluated fairly."],
+  "세금":["세금을 제때 냈어요.","I paid taxes on time."],
+  "소비":["소비를 좀 줄였어요.","I cut back on spending a bit."],
+  "교통비":["교통비가 많이 들어요.","Transportation costs a lot."],
+  "비용":["수리 비용이 비싸요.","The repair cost is expensive."],
+  "재산":["그는 재산이 많아요.","He has a lot of wealth."],
+  "재정":["회사 재정이 안정적이에요.","The company's finances are stable."],
+  "재화":["재화와 서비스를 거래해요.","They trade goods and services."],
+  "상품":["이 상품이 인기가 많아요.","This product is very popular."],
+  "상점":["길에 상점이 많아요.","There are many shops on the street."],
+  "상업":["이 지역은 상업이 발달했어요.","Commerce is developed in this area."],
+  "수익":["올해 수익이 늘었어요.","Profits increased this year."],
+  "지출":["이번 달 지출이 많아요.","This month's spending is high."],
+  "지원":["회사가 직원을 지원해요.","The company supports its employees."],
+  "지급":["월급이 제때 지급돼요.","The salary is paid on time."],
+  "이용":["지하철을 자주 이용해요.","I often use the subway."],
+  "이익":["회사가 큰 이익을 냈어요.","The company made a big profit."],
+  "편리":["이 앱은 정말 편리해요.","This app is really convenient."],
+  "가능성":["성공할 가능성이 높아요.","The chance of success is high."],
+  "중요성":["교육의 중요성을 알아요.","I know the importance of education."],
+  "증명":["그 사실을 증명했어요.","I proved that fact."],
+  "학생증":["학생증을 보여 주세요.","Please show your student ID."],
+  "영수증":["영수증을 받으세요.","Please take your receipt."],
+  "목적":["여행 목적이 뭐예요?","What is the purpose of your trip?"],
+  "문화적":["문화적 차이가 있어요.","There are cultural differences."],
+  "개인적":["그건 개인적인 일이에요.","That is a personal matter."],
+  "전통":["이 마을은 전통을 지켜요.","This village keeps its traditions."],
+  "통계":["통계에 따르면 인구가 줄어요.","According to statistics, the population is shrinking."],
+  "완전":["문제가 완전히 해결됐어요.","The problem was completely solved."],
+  "전국":["이 가게는 전국에 있어요.","This shop is nationwide."],
+  "상식":["그건 기본 상식이에요.","That's basic common sense."],
+  "일상":["일상이 조금 지루해요.","Daily life is a little boring."],
+  "예방":["감기를 예방하세요.","Prevent catching a cold."],
+  "방어":["팀이 잘 방어했어요.","The team defended well."],
+  "소방서":["소방서가 근처에 있어요.","The fire station is nearby."],
+  "2호선":["2호선을 타고 시청에 가요.","Take Line 2 to City Hall."],
+  "고등학교":["저는 고등학교를 졸업했어요.","I graduated from high school."],
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let activeGroups = new Set(GROUPS.map(g => g.id));
+let isFlipped    = false;
+let history      = [];
+let pointer      = -1;
+let cardIdx      = 0;
+let peekCard     = null;   // when set, a one-off card from a disabled group (not in rotation)
+
+// ── STARRED CARDS (persisted) ─────────────────────────────────────────────
+// Stable id per card = "group|root" (root alone isn't unique: 금(金) appears twice).
+const STAR_GROUP = 0;  // virtual group id for the Starred set
+function cardId(c) { return c.group + '|' + c.root; }
+
+let starred = new Set();
+try {
+  const saved = localStorage.getItem('hanja_starred');
+  if (saved) starred = new Set(JSON.parse(saved));
+} catch (e) {}
+
+function saveStarred() {
+  try { localStorage.setItem('hanja_starred', JSON.stringify([...starred])); } catch (e) {}
+}
+
+function isStarred(c) { return c && starred.has(cardId(c)); }
+
+function toggleStar(e) {
+  if (e) e.stopPropagation();
+  const c = currentCard();
+  if (!c) return;
+  const id = cardId(c);
+  if (starred.has(id)) starred.delete(id); else starred.add(id);
+  saveStarred();
+  updateStarBtn();
+  // if viewing the Starred group and we just un-starred, the deck shrank — re-render handles it
+  if (activeGroups.has(STAR_GROUP) && activeGroups.size === 1) {
+    // keep showing this card (peek-like) even if removed, until Next
+  }
+}
+
+function updateStarBtn() {
+  const c = currentCard();
+  const btn = document.getElementById('star-btn');
+  if (!c) { btn.style.display = 'none'; return; }
+  btn.style.display = 'flex';
+  const on = isStarred(c);
+  btn.classList.toggle('on', on);
+  btn.innerText = on ? '★' : '☆';
+}
+
+// The card currently shown: a peeked card if active, else the rotation card.
+function currentCard() {
+  if (peekCard) return peekCard;
+  const deck = getActiveDeck();
+  return deck.length ? deck[cardIdx] : null;
+}
+
+function getActiveDeck() {
+  return CARDS.filter(c => activeGroups.has(c.group) || (activeGroups.has(STAR_GROUP) && isStarred(c)));
+}
+
+// Produce a single-quoted JS string literal safe to embed inside a double-quoted
+// HTML attribute (onclick="..."). Escapes backslashes and single quotes.
+function jsArg(s) {
+  return "'" + String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+}
+
+// ── BREAKDOWN TILE RENDERER ─────────────────────────────────────────────
+// Render one breakdown line as: word text + syllable tiles + result text.
+// A tile is tappable when PIECEMAP has a verified deck-root hanja for that piece.
+function renderBreakdownTiles(line) {
+  // Split "<b>WORD</b>: PIECES → RESULT"
+  const wm = line.match(/^<b>([^<]+)<\/b>:?\s*/);
+  const word = wm ? wm[1] : '';
+  let rest = wm ? line.slice(wm[0].length) : line;
+  const arrowI = rest.indexOf('→');
+  const head = arrowI >= 0 ? rest.slice(0, arrowI) : rest;
+  const result = arrowI >= 0 ? rest.slice(arrowI + 1).trim() : '';
+
+  // Each piece is "Gloss (음)" joined by + (sometimes with extra bracket notes).
+  // We extract gloss + syllable pairs; non-piece text (like [compound notes]) is dropped from tiles.
+  const pieces = [];
+  const re = /([A-Za-z][A-Za-z0-9/ .\-]*?)\s*\(([가-힣])\)/g;
+  let m;
+  while ((m = re.exec(head)) !== null) {
+    pieces.push({ gloss: m[1].trim(), syl: m[2] });
+  }
+
+  let html = '<div class="bd-line">';
+  if (word) html += `<span class="bd-word">${word}</span>`;
+  pieces.forEach((p, i) => {
+    if (i > 0) html += '<span class="bd-plus">+</span>';
+    const key = `${word}|${p.syl}`;
+    const hit = PIECEMAP[key];
+    if (hit) {
+      const [hanja, rootStr] = hit;
+      const card = CARDS.find(c => c.root === rootStr);
+      const head2 = `${p.syl} (${hanja})`;
+      const gl = p.gloss.toLowerCase();
+      const active = card && activeGroups.has(card.group);
+      if (active) {
+        html += `<span class="tile tap" onclick="jumpToCardRoot(event,${jsArg(rootStr)})">`
+              + `<span class="t-head">${head2}</span><span class="t-gl">${gl}</span></span>`;
+      } else if (card) {
+        // target exists but its group is disabled → yellow one-off preview
+        html += `<span class="tile peek" onclick="peekCardRoot(event,${jsArg(rootStr)})">`
+              + `<span class="t-head">${head2}</span><span class="t-gl">${gl}</span></span>`;
+      } else {
+        html += `<span class="tile"><span class="t-head">${head2}</span><span class="t-gl">${gl}</span></span>`;
+      }
+    } else {
+      html += `<span class="tile"><span class="t-head">${p.syl}</span><span class="t-gl">${p.gloss.toLowerCase()}</span></span>`;
+    }
+  });
+  if (result) html += `<span class="bd-arrow">→</span><span class="bd-result">${result}</span>`;
+  const sent = SENT[word];
+  if (sent) {
+    html += `<div class="sent"><div class="sent-ko">${boldWord(sent[0], word)}</div>`
+          + `<div class="sent-en">${sent[1]}</div></div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+// Bold the target word within the Korean sentence (handles attached particles).
+function boldWord(sentence, word) {
+  const i = sentence.indexOf(word);
+  if (i < 0) return sentence;
+  return sentence.slice(0, i) + '<b>' + word + '</b>' + sentence.slice(i + word.length);
+}
+
+// ── CARD LOGIC ────────────────────────────────────────────────────────────
+const $card = document.getElementById('flashcard');
+
+function randIdx(deck, exclude) {
+  if (deck.length <= 1) return 0;
+  let i;
+  do { i = Math.floor(Math.random() * deck.length); } while (i === exclude);
+  return i;
+}
+
+function renderCard() {
+  const deck = getActiveDeck();
+  const d = currentCard();
+  if (!d) {
+    document.getElementById('affix-ko').innerText = '—';
+    document.getElementById('examples-ko').innerHTML = '';
+    document.getElementById('affix-en').innerText = 'No groups active';
+    document.getElementById('affix-ko-back').innerText = '';
+    document.getElementById('examples-en').innerHTML = '<div style="color:#475569;font-size:.75rem">Enable at least one group in ☰</div>';
+    document.getElementById('grp-badge').innerText = '—';
+    document.getElementById('prog-front').innerText = '—';
+    document.getElementById('prog-back').innerText = '—';
+    document.getElementById('deck-info').innerText = 'No cards active — open ☰ to enable groups';
+    document.getElementById('star-btn').style.display = 'none';
+    return;
+  }
+  const g = GROUPS.find(g => g.id === d.group);
+  document.getElementById('affix-ko').innerText = d.root;
+  document.getElementById('examples-ko').innerHTML = d.examples.map(e => {
+    const s = SENT[e];
+    return s ? `<div>${boldWord(s[0], e)}</div>` : `<div>${e}</div>`;
+  }).join('');
+  document.getElementById('affix-en').innerText = d.gloss;
+  document.getElementById('affix-ko-back').innerText = d.root;
+  document.getElementById('examples-en').innerHTML = d.breakdown.map(b => renderBreakdownTiles(b)).join('');
+  document.getElementById('grp-badge').innerText = g ? g.name : '';
+  if (peekCard) {
+    document.getElementById('prog-front').innerText = 'Preview · disabled group';
+    document.getElementById('prog-back').innerText = 'Preview · disabled group';
+    document.getElementById('deck-info').innerText = 'Previewing a card from a disabled group · Next returns to your deck';
+  } else {
+    const lbl = `Card ${pointer + 1}`;
+    document.getElementById('prog-front').innerText = lbl;
+    document.getElementById('prog-back').innerText = lbl;
+    document.getElementById('deck-info').innerText = `${deck.length} card${deck.length !== 1 ? 's' : ''} active · tap to flip`;
+  }
+  document.getElementById('info-btn').style.display = currentCardHasNote() ? 'flex' : 'none';
+  updateStarBtn();
+}
+
+function initDeck() {
+  peekCard = null;
+  const deck = getActiveDeck();
+  if (deck.length === 0) { renderCard(); return; }
+  const start = Math.floor(Math.random() * deck.length);
+  history = [start];
+  pointer = 0;
+  cardIdx = start;
+  renderCard();
+}
+
+function flipCard() {
+  if (noteOpen) { closeNote(); return; }
+  isFlipped = !isFlipped;
+  $card.classList.toggle('flipped', isFlipped);
+}
+function resetFlip() {
+  if (noteOpen) closeNote();
+  isFlipped = false;
+  $card.classList.remove('flipped');
+}
+
+function nextCard(e) {
+  if (e) e.stopPropagation();
+  const was = isFlipped;
+  resetFlip();
+  const deck = getActiveDeck();
+  if (!deck.length) { peekCard = null; renderCard(); return; }
+  const wasPeek = !!peekCard;
+  peekCard = null;
+  setTimeout(() => {
+    if (wasPeek) {
+      // leaving a preview: advance to a fresh active-group card
+      const ni = randIdx(deck, history[pointer]);
+      history.push(ni);
+      pointer++;
+    } else if (pointer < history.length - 1) {
+      pointer++;
+    } else {
+      const ni = randIdx(deck, history[pointer]);
+      history.push(ni);
+      pointer++;
+    }
+    cardIdx = history[pointer];
+    renderCard();
+  }, was ? 250 : 0);
+}
+
+function prevCard(e) {
+  if (e) e.stopPropagation();
+  const wasPeek = !!peekCard;
+  if (!wasPeek && pointer <= 0) return;
+  const was = isFlipped;
+  resetFlip();
+  peekCard = null;
+  setTimeout(() => {
+    if (!wasPeek) pointer--;
+    cardIdx = history[pointer];
+    renderCard();
+  }, was ? 250 : 0);
+}
+
+// Swipe
+let ty0 = 0;
+let swipeFromScroll = false;
+$card.addEventListener('touchstart', e => {
+  ty0 = e.changedTouches[0].screenY;
+  // If the touch began inside the scrollable breakdown, treat it as scrolling, not a swipe.
+  swipeFromScroll = !!(e.target.closest && e.target.closest('#examples-en'));
+}, { passive:true });
+$card.addEventListener('touchend',   e => {
+  if (noteOpen || swipeFromScroll) return;
+  const d = ty0 - e.changedTouches[0].screenY;
+  if (d > 60) nextCard();
+  else if (d < -60) prevCard();
+}, { passive:true });
+
+// ── AMBIGUITY NOTES ─────────────────────────────────────────────────────
+let noteOpen = false;
+
+function sylOf(card) { return card.root.split(' ')[0]; }
+
+function currentCardHasNote() {
+  const d = currentCard();
+  return d ? !!NOTES[sylOf(d)] : false;
+}
+
+function renderEntry(syl, hanja, gloss, ex) {
+  const root = hanja ? `${syl} (${hanja})` : '';
+  const card = root ? CARDS.find(c => c.root === root) : null;
+  const head = hanja ? `${syl} (${hanja})` : syl;
+  let cls = 'note-entry', onclick = '';
+  if (card && activeGroups.has(card.group)) {
+    cls += ' tappable';
+    onclick = ` onclick="jumpToCardRoot(event,${jsArg(root)});closeNote()"`;
+  } else if (card) {
+    cls += ' peekable';
+    onclick = ` onclick="peekCardRoot(event,${jsArg(root)});closeNote()"`;
+  }
+  return `<div class="${cls}"${onclick}>`
+       + `<span class="ne-head">${head}</span> `
+       + `<span class="ne-gloss">${gloss}</span>`
+       + `<div class="ne-ex">${ex}</div>`
+       + `</div>`;
+}
+
+function buildNoteBody(card) {
+  const syl = sylOf(card);
+  const data = NOTES[syl];
+  let html = '';
+  if (data.sino) {
+    html += '<div class="note-section"><div class="note-label sino">Sino-Korean</div>';
+    html += data.sino.map(([h,g,e]) => renderEntry(syl,h,g,e)).join('');
+    html += '</div>';
+  }
+  if (data.native) {
+    html += '<div class="note-section"><div class="note-label nat">Native Korean</div>';
+    html += data.native.map(([h,g,e]) => renderEntry(syl,h,g,e)).join('');
+    html += '</div>';
+  }
+  return html;
+}
+
+function openNote(e) {
+  if (e) e.stopPropagation();
+  const card = currentCard();
+  if (!card) return;
+  document.getElementById('note-title').innerText = sylOf(card) + ' — homophones';
+  document.getElementById('note-body').innerHTML = buildNoteBody(card);
+  document.getElementById('note-overlay').classList.add('show');
+  noteOpen = true;
+}
+
+function closeNote(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('note-overlay').classList.remove('show');
+  noteOpen = false;
+}
+
+function jumpFromNote(di) {
+  closeNote();
+  // di is an active-deck position (homophone chips are built from active deck)
+  jumpToActivePos(di);
+}
+
+// Jump into rotation: target is in an active group.
+function jumpToActivePos(deckPos) {
+  resetFlip();
+  peekCard = null;
+  history.push(deckPos);
+  pointer = history.length - 1;
+  cardIdx = deckPos;
+  renderCard();
+}
+
+// Tap a green tile (active group) — jump by card root, enters rotation.
+function jumpToCardRoot(e, rootStr) {
+  if (e) e.stopPropagation();
+  const deck = getActiveDeck();
+  const pos = deck.findIndex(c => c.root === rootStr);
+  if (pos < 0) { peekCardRoot(null, rootStr); return; }  // safety: group got disabled
+  jumpToActivePos(pos);
+}
+
+// Tap a yellow tile (disabled group) — show that card ONCE without entering rotation.
+function peekCardRoot(e, rootStr) {
+  if (e) e.stopPropagation();
+  const card = CARDS.find(c => c.root === rootStr);
+  if (!card) return;
+  resetFlip();
+  peekCard = card;
+  renderCard();
+}
+
+// ── VIEW SWITCHING ────────────────────────────────────────────────────────
+function showCards() {
+  document.getElementById('view-cards').classList.add('active');
+  document.getElementById('view-table').classList.remove('active');
+  document.getElementById('table-btn').style.display = '';
+}
+
+function showTable() {
+  document.getElementById('view-table').classList.add('active');
+  document.getElementById('view-cards').classList.remove('active');
+  document.getElementById('table-btn').style.display = 'none';
+  renderTable();
+}
+
+// ── TABLE VIEW ────────────────────────────────────────────────────────────
+function renderTable() {
+  const q    = document.getElementById('tbl-input').value.toLowerCase().trim();
+  const deck = getActiveDeck();
+  const el   = document.getElementById('tbl-scroll');
+
+  const byGroup = {};
+  deck.forEach(card => {
+    if (q) {
+      const hit = card.root.toLowerCase().includes(q)
+               || card.gloss.toLowerCase().includes(q)
+               || card.examples.some(x => x.toLowerCase().includes(q))
+               || card.breakdown.some(x => x.replace(/<[^>]+>/g,'').toLowerCase().includes(q));
+      if (!hit) return;
+    }
+    (byGroup[card.group] = byGroup[card.group] || []).push(card);
+  });
+
+  const gids = Object.keys(byGroup).map(Number).sort((a,b) => a-b);
+  if (!gids.length) {
+    el.innerHTML = `<div class="empty-msg">${deck.length === 0
+      ? 'No groups active.<br>Open ☰ to enable groups.'
+      : 'No results for that filter.'}</div>`;
+    return;
+  }
+
+  el.innerHTML = gids.map(gid => {
+    const gName = GROUPS.find(g => g.id === gid)?.name || '';
+    const rows  = byGroup[gid].map(card => {
+      const di = deck.indexOf(card);
+      const [rootHangul, hanjaRaw] = [card.root.split(' ')[0], card.root.match(/\(([^)]+)\)/)?.[1] || ''];
+      return `<div class="tbl-row" onclick="jumpToCard(${di})">
+        <div class="tbl-root">${rootHangul}</div>
+        <div class="tbl-hanja">${hanjaRaw}</div>
+        <div class="tbl-gloss">${card.gloss}</div>
+        <div class="tbl-arrow">›</div>
+      </div>`;
+    }).join('');
+    return `<div class="grp-hdr">Group ${gid} · ${gName}</div>${rows}`;
+  }).join('');
+}
+
+function jumpToCard(di) {
+  showCards();
+  jumpToActivePos(di);
+}
+
+// ── MENU ──────────────────────────────────────────────────────────────────
+function renderMenu() {
+  const starCount = starred.size;
+  const starChecked = activeGroups.has(STAR_GROUP) ? 'checked' : '';
+  const starRow = `<div class="grp-item star-row">
+      <div class="grp-item-label">
+        <div class="grp-item-name">★ Starred</div>
+        <div class="grp-item-count">${starCount} card${starCount !== 1 ? 's' : ''}</div>
+      </div>
+      <label class="tog">
+        <input type="checkbox" ${starChecked} onchange="toggleGroup(${STAR_GROUP},this.checked)">
+        <div class="tog-track"></div>
+        <div class="tog-thumb"></div>
+      </label>
+    </div>`;
+  const groupRows = GROUPS.map(g => {
+    const count   = CARDS.filter(c => c.group === g.id).length;
+    const checked = activeGroups.has(g.id) ? 'checked' : '';
+    return `<div class="grp-item">
+      <div class="grp-item-label">
+        <div class="grp-item-name">Group ${g.id}: ${g.name}</div>
+        <div class="grp-item-count">${count} roots</div>
+      </div>
+      <label class="tog">
+        <input type="checkbox" ${checked} onchange="toggleGroup(${g.id},this.checked)">
+        <div class="tog-track"></div>
+        <div class="tog-thumb"></div>
+      </label>
+    </div>`;
+  }).join('');
+  document.getElementById('grp-list').innerHTML = starRow + groupRows;
+}
+
+function toggleGroup(id, on) {
+  on ? activeGroups.add(id) : activeGroups.delete(id);
+}
+
+function setAll(on) {
+  // preserve Starred toggle state; All On/Off acts on the 7 real groups
+  const starOn = activeGroups.has(STAR_GROUP);
+  activeGroups = on ? new Set(GROUPS.map(g => g.id)) : new Set();
+  if (starOn) activeGroups.add(STAR_GROUP);
+  renderMenu();
+}
+
+function openMenu() {
+  renderMenu();
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeMenu() {
+  document.getElementById('overlay').classList.remove('open');
+  initDeck();
+  // refresh table if visible
+  if (document.getElementById('view-table').classList.contains('active')) renderTable();
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('overlay')) closeMenu();
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────
+initDeck();
+</script>
+</body>
+</html>
